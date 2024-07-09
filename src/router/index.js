@@ -16,6 +16,14 @@ const router = createRouter({
           path: "/home/primarily",
           component: () => import('@/views/Primarily/index.vue')
         },
+        {
+          path: "/home/guide",
+          component: () => import('@/views/Guide/index.vue')
+        },
+        {
+          path: "/home/exhibition",
+          component: () => import('@/views/Exhibition/index.vue')
+        },
       ]
     },
   ],

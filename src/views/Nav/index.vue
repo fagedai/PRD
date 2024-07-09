@@ -9,35 +9,43 @@ const list = ref([
     { path: "/home/enroll", name: "我要报名" },
 ]);
 
-const curIdx = ref(0);
+const curIdx = ref(-1);
 const actIdx = ref(0);
 const isIndexActive = (index) => {
     return index === curIdx.value || index === actIdx.value;
 };
 const updateActiveIndex = (index) => {
     actIdx.value = index;
-    // 将激活的索引保存到本地存储
-    localStorage.setItem('activeIndex', index);
+    // 将激活的索引保存到sessionStorage
+    sessionStorage.setItem('activeIndex', index);
 };
+
+// 从sessionStorage获取激活的索引
+const storedIndex = sessionStorage.getItem('activeIndex');
+if (storedIndex !== null) {
+    actIdx.value = parseInt(storedIndex, 10);
+}
 </script>
 <template>
     <div class="nav">
-        <div class="nav_item">
+        <div class="nav_item" @mouseleave="curIdx = -1">
             <div class="nav_logo">
                 <img src="/src/assets/PC端_slices/组 4@2x(3).png" alt="Logo" />
             </div>
-            <ul class="nav_column">
-                <li v-for="( item, index ) in  list" :key="index" :class="{ active: isIndexActive(index) }"
-                    @mouseenter="curIdx = index" @mouseleave="curIdx = -1" @click="updateActiveIndex(index)">
-                    <span>{{ item.name }}</span>
-                </li>
-            </ul>
+            <div class="nav_column">
+                <routerLink :to="route.path" v-for="( route, index ) in  list" :key="index" class="link"
+                    :class="{ active: isIndexActive(index) }" @mouseenter="curIdx = index" @mouseleave="curIdx = -1"
+                    @click="updateActiveIndex(index)">
+                    <span>{{ route.name }}</span>
+                </routerLink>
+            </div>
             <div class="nav_login">
                 登录
             </div>
         </div>
     </div>
 </template>
+
 
 <style scoped>
 .nav {
@@ -64,7 +72,7 @@ const updateActiveIndex = (index) => {
     float: left;
     margin-top: 10px;
 
-    li {
+    .link {
         float: left;
         height: 40px;
         padding: 0 20px;

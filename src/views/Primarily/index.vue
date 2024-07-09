@@ -58,7 +58,7 @@
                 <h1>作品展示</h1>
             </div>
             <ul>
-                <li>
+                <li style="margin-left: 20px;">
                     <div>
                         <p>工业机器人编程的案例化教学</p>
                     </div>
@@ -86,7 +86,7 @@
                     <p style="float: left; margin-left: 10px;">浏览 <i style="font-size: 15px;">56</i></p>
                     <p style="float: right;margin-right: 10px;">2021-12-09</p>
                 </li>
-                <li>
+                <li style="margin-left: 20px;">
                     <div>
                         <p>汇聚直播力量，助力乡村发展</p>
                     </div>
@@ -307,7 +307,7 @@
             float: left;
             height: 180px;
             width: 300px;
-            margin: 0 30px 30px 0;
+            margin: 0 20px 30px 0;
             background-color: #fff;
 
             div {
