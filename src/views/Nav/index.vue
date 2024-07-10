@@ -4,9 +4,8 @@ import { ref } from "vue";
 const list = ref([
     { path: "/home/primarily", name: "首页" },
     { path: "/home/guide", name: "比赛指南" },
-    { path: "/home/exhibition", name: "作品展示" },
-    { path: "/home/roster", name: "获奖名单" },
     { path: "/home/enroll", name: "我要报名" },
+    { path: "/home/expert", name: "专家评审" },
 ]);
 
 const curIdx = ref(-1);
@@ -39,9 +38,9 @@ if (storedIndex !== null) {
                     <span>{{ route.name }}</span>
                 </routerLink>
             </div>
-            <div class="nav_login">
+            <router-link to="/login" class="nav_login">
                 登录
-            </div>
+            </router-link>
         </div>
     </div>
 </template>

@@ -1,6 +1,6 @@
 # PRD
 
-This template should help get you started developing with Vue 3 in Vite.
+本项目为某市职业学校教学能力大赛前端搭建，包括接口调接，页面构建等
 
 ## Recommended IDE Setup
 

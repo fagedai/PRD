@@ -55,67 +55,40 @@
         </div>
         <div class="pri_down">
             <div class="pri_mid_head">
-                <h1>作品展示</h1>
+                <h1>通知公告</h1>
             </div>
             <ul>
-                <li style="margin-left: 20px;">
-                    <div>
-                        <p>工业机器人编程的案例化教学</p>
-                    </div>
-                    <p style="float: left; margin-left: 10px;">浏览 <i style="font-size: 15px;">56</i></p>
-                    <p style="float: right;margin-right: 10px;">2021-12-09</p>
+                <li>
+                    <router-link to="/">
+                        <p>关于公布2023年全国职业院校技能大赛德育与思想政治教育有关赛项现场决赛的通知</p>
+                    </router-link>
                 </li>
                 <li>
-                    <div>
-                        <p>数控车床加工工艺与编程操作</p>
-                    </div>
-                    <p style="float: left; margin-left: 10px;">浏览 <i style="font-size: 15px;">56</i></p>
-                    <p style="float: right;margin-right: 10px;">2021-12-09</p>
+                    <router-link to="/">
+                        <p>关于举办2023年全国职业院校技能大赛教学能力比赛决赛有关事项的通知</p>
+                    </router-link>
                 </li>
                 <li>
-                    <div>
-                        <p>物流作业管理</p>
-                    </div>
-                    <p style="float: left; margin-left: 10px;">浏览 <i style="font-size: 15px;">56</i></p>
-                    <p style="float: right;margin-right: 10px;">2021-12-09</p>
+                    <router-link to="/">
+                        <p>教育部办公厅关于举办2023年全国职业院校技能大赛德育与思想政治教育有关事项的通知</p>
+                    </router-link>
+                </li>
+                <li><router-link to="/">
+                        <p>2023年全国职业院校技能大赛思想政治教育课程教学能力比赛方案（中等职业院校等）通知</p>
+                    </router-link>
                 </li>
                 <li>
-                    <div>
-                        <p>汇聚直播力量，助力乡村发展</p>
-                    </div>
-                    <p style="float: left; margin-left: 10px;">浏览 <i style="font-size: 15px;">56</i></p>
-                    <p style="float: right;margin-right: 10px;">2021-12-09</p>
-                </li>
-                <li style="margin-left: 20px;">
-                    <div>
-                        <p>汇聚直播力量，助力乡村发展</p>
-                    </div>
-                    <p style="float: left; margin-left: 10px;">浏览 <i style="font-size: 15px;">56</i></p>
-                    <p style="float: right;margin-right: 10px;">2021-12-09</p>
+                    <router-link to="/">
+                        <p>2023年全国职业院校技能大赛中等职业学校班主任能力比赛方案</p>
+                    </router-link>
                 </li>
                 <li>
-                    <div>
-                        <p>物流作业管理</p>
-                    </div>
-                    <p style="float: left; margin-left: 10px;">浏览 <i style="font-size: 15px;">56</i></p>
-                    <p style="float: right;margin-right: 10px;">2021-12-09</p>
+                    <router-link to="/">
+                        <p>2023年全国职业院校技能大赛教学能力比赛常见问题答疑</p>
+                    </router-link>
                 </li>
-                <li>
-                    <div>
-                        <p>工业机器人编程的案例化教学</p>
-                    </div>
-                    <p style="float: left; margin-left: 10px;">浏览 <i style="font-size: 15px;">56</i></p>
-                    <p style="float: right;margin-right: 10px;">2021-12-09</p>
-                </li>
-                <li>
-                    <div>
-                        <p>工业机器人编程的案例化教学</p>
-                    </div>
-                    <p style="float: left; margin-left: 10px;">浏览 <i style="font-size: 15px;">56</i></p>
-                    <p style="float: right;margin-right: 10px;">2021-12-09</p>
-                </li>
+
             </ul>
-            <router-link to="/home/exhibition" class="exhibition_to">查看更多</router-link>
         </div>
     </div>
 </template>
@@ -298,52 +271,33 @@
 
 .pri_down {
     position: relative;
-    height: 800px;
-    width: 1290px;
+    height: 400px;
+    width: 1270px;
     margin: auto;
 
     ul {
         li {
             float: left;
-            height: 180px;
-            width: 300px;
-            margin: 0 20px 30px 0;
-            background-color: #fff;
+            list-style: disc;
+            margin: 10px;
+            width: 610px;
 
-            div {
-                height: 130px;
-                width: 277px;
-                margin: 10px;
-                background-image: url('@/assets/PC端_slices/组 4.png');
-                background-size: contain;
-                background-repeat: no-repeat;
-
-                p {
-                    padding: 20px;
-                    font-size: 20px;
-                    font-weight: 540;
-                }
+            p {
+                font-size: 17px;
+                font-weight: bold;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
             }
 
-            &:nth-child(4n) {
-                margin-right: 0;
+            a:hover {
+                color: #436EFF;
+            }
+
+            &:nth-child(2n) {
+                float: right;
             }
         }
-    }
-
-    .exhibition_to {
-        position: absolute;
-        display: inline-block;
-        width: 100px;
-        height: 40px;
-        bottom: 17%;
-        left: 50%;
-        transform: translateX(-50%);
-        background-color: #436EFF;
-        color: #fff;
-        text-align: center;
-        line-height: 40px;
-        border-radius: 5px;
     }
 }
 </style>
