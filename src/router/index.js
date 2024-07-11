@@ -22,7 +22,7 @@ const router = createRouter({
         },
         {
           path: "/home/enroll",
-          component: () => import('@/views/Enroll/index.vue')
+          component: () => import('@/views/Enroll/index.vue'),
         },
         {
           path: "/home/upload",
@@ -36,6 +36,6 @@ const router = createRouter({
       top: 0
     }
   }
-})
+});
 
 export default router

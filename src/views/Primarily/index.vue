@@ -1,4 +1,10 @@
 <script setup>
+const ToEnroll = () => {
+    sessionStorage.setItem('activeIndex', 2);
+}
+const ToGuide = () => {
+    sessionStorage.setItem('activeIndex', 1);
+}
 </script>
 
 <template>
@@ -7,10 +13,10 @@
             <img src="@/assets/PC端_slices/组 2.png" alt="">
             <div class="pri_up_font">
                 <h1 style="font-size: 55px; color: #fff;">2023青岛市中职教学能力大赛平台</h1>
-                <router-link to="/home/enroll" class="pri_to">
+                <a href="/home/enroll" class="pri_to" @click="ToEnroll">
                     我要报名
                     <i></i>
-                </router-link>
+                </a>
             </div>
         </div>
         <div class="pri_mid">
@@ -49,7 +55,7 @@
                 <p>1.教学内容。根据职业教育国家标准要求，对接职业标准（规范）、职业技能等级标准等，优化课程体系和教学目标，拓展教学内容深<br>度和广度（思政课要严格按照国规教材或国家课程标准规定教学模块和内容进行教学）。
                 </p>
                 <br>
-                <router-link to="/home/guide" class="guide_to">查看更多</router-link>
+                <a href="/home/guide" class="guide_to" @click="ToGuide">查看更多</a>
                 <img src="@/assets/PC端_slices/组 4(2).png" alt="">
             </div>
         </div>

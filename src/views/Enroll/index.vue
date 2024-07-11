@@ -1,10 +1,22 @@
 <script lang="ts" setup>
 import { reactive, ref } from 'vue'
+import { Delete, Download, Plus, ZoomIn } from '@element-plus/icons-vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import type { ComponentSize, FormInstance, FormRules, UploadInstance } from 'element-plus'
+import type { ComponentSize, FormInstance, FormRules, UploadInstance, UploadFile } from 'element-plus'
 
 // 公用模块
-const nowIdx = ref(0);
+const nowIdx = ref(1);
+const fa_height = ref(1240);
+const ChangeNowIdx = () => {
+    if (nowIdx.value === 0)
+        nowIdx.value = 1
+    else
+        nowIdx.value = 0;
+    window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+    });
+}
 // 数据导入
 const beforeUPload = (file: any) => {
     const isExcel =
@@ -32,10 +44,10 @@ const handleSuccess = () => {
 };
 // 文件上传
 const uploadExcel = async (file: any) => {
-    if (ruleForm.time == '' || ruleForm.fileList[0] == '' || ruleForm.files[0] == '')
-        return ElMessage.error('日期或者文件不能为空！')
-    let gasDataFile = ruleForm.fileList[0].raw
-    let electricityDataFile = ruleForm.files[0].raw
+    if (ruleForm.enlist[0] == '' || ruleForm.publicity[0] == '')
+        return ElMessage.error('文件不能为空！')
+    let gasDataFile = ruleForm.enlist[0].raw
+    let electricityDataFile = ruleForm.publicity[0].raw
 
     await dataInput({ time: ruleForm.time, gasDataFile, electricityDataFile }).then((res: any) => {
         if (res.message == '成功') {
@@ -47,11 +59,11 @@ const uploadExcel = async (file: any) => {
     })
     getList()
     if (gasDataFile !== '') {
-        form.time = ''
-        uploadRefs.value?.clearFiles()
+        ruleForm.time = ''
+        uploadRef1.value?.clearFiles()
     }
     if (electricityDataFile !== '') {
-        uploadRef.value?.clearFiles()
+        uploadRef2.value?.clearFiles()
     }
 }
 
@@ -146,8 +158,8 @@ const submitForm = async (formEl: FormInstance | undefined) => {
             console.log('error submit!', fields)
         }
     })
-    uploadRef1.value!.submit()
-    uploadRef2.value!.submit()
+    // uploadRef1.value!.submit()
+    // uploadRef2.value!.submit()
 }
 
 
@@ -155,8 +167,81 @@ const submitForm = async (formEl: FormInstance | undefined) => {
 // 上传参赛作品模块
 
 
+const dialogImageUrl = ref('')
+const dialogVisible = ref(false)
+const disabled = ref(false)
 
+const handleRemove = (file: UploadFile) => {
+    console.log(file)
+}
 
+const handlePictureCardPreview = (file: UploadFile) => {
+    dialogImageUrl.value = file.url!
+    dialogVisible.value = true
+}
+
+const handleDownload = (file: UploadFile) => {
+    console.log(file)
+}
+const SaveForm = () => {
+    ElMessage.success('已保存！');
+}
+const SubmitForm = () => {
+    ElMessage.success('提交成功！');
+}
+const UploadFormRef = ref<FormInstance>()
+const UploadForm = reactive<any>({
+    vedio: [],
+    teachPlan: [],
+    report: [],
+    schemePlan: [],
+    standard: [],
+    explain: []
+})
+const Uprules = reactive<FormRules<any>>({
+    vedio: [
+        {
+            required: true,
+            message: '请上传参赛报名表',
+            trigger: 'blur',
+        },
+    ],
+    teachPlan: [
+        {
+            required: true,
+            message: '请上传教案',
+            trigger: 'blur',
+        },
+    ],
+    report: [
+        {
+            required: true,
+            message: '请上传专业人才培养方案',
+            trigger: 'blur',
+        },
+    ],
+    schemePlan: [
+        {
+            required: true,
+            message: '请上传课程标准',
+            trigger: 'blur',
+        },
+    ],
+    standard: [
+        {
+            required: true,
+            message: '请上传教材选用说明',
+            trigger: 'blur',
+        },
+    ],
+    explain: [
+        {
+            required: true,
+            message: '请上传参赛报名表',
+            trigger: 'blur',
+        },
+    ],
+})
 
 </script>
 
@@ -164,11 +249,13 @@ const submitForm = async (formEl: FormInstance | undefined) => {
     <div class="enroll">
         <!-- 填写作品信息模块 -->
         <div class="enroll_head">
-            <div class="leftbox" @click="nowIdx = 0" style="cursor: pointer;">填写作品信息</div>
-            <i></i>
-            <div class="rightbox" @click="nowIdx = 1" style="cursor: pointer;">上传参赛作品</div>
+            <div class="leftbox" style="cursor: pointer;"
+                :class="{ active_head: nowIdx === 0, hidden_head: nowIdx === 1 }">填写作品信息</div>
+            <i :class="{ active_i: nowIdx === 0, hidden_i: nowIdx === 1 }"></i>
+            <div class="rightbox" style="cursor: pointer;"
+                :class="{ active_head: nowIdx === 1, hidden_head: nowIdx === 0 }">上传参赛作品</div>
         </div>
-        <div class="enroll_body">
+        <div class="enroll_body" style="height: auto;">
             <div v-show="nowIdx === 0" class="box1">
                 <div class="enroll_form">
                     <el-form ref="ruleFormRef" style="max-width: 600px" :model="ruleForm" :rules="rules"
@@ -260,19 +347,302 @@ const submitForm = async (formEl: FormInstance | undefined) => {
                         <el-form-item label="联系方式" prop="phone">
                             <el-input v-model="ruleForm.phone" placeholder="请填写联系方式" />
                         </el-form-item>
-                        <el-form-item style="margin: 60px 315px;" class="is-required">
-                            <el-button type="primary" @click="submitForm(ruleFormRef)">
+                        submitForm(ruleFormRef)
+                        <el-form-item style="margin: 60px 209px;" class="is-required">
+                            <el-button type="primary" @click="ChangeNowIdx"
+                                style=" font-size: 20px; padding: 25px 60px;">
                                 下一步
                             </el-button>
                         </el-form-item>
                     </el-form>
                 </div>
-
             </div>
 
             <!-- 上传参赛作品模块 -->
-            <div v-show="nowIdx === 1" class="box2">
-                1
+            <div v-show="nowIdx === 1" style="padding-bottom:10px">
+                <div class="box2 upload_head">
+                    <div class="left">
+                        <ul>
+                            <li>
+                                <span>课堂实录</span>
+                            </li>
+                            <li>
+                                <span>教案</span>
+                            </li>
+                            <li>
+                                <span>教学实施报告</span>
+                            </li>
+                            <li>
+                                <span>专业人才培养方案</span>
+                            </li>
+                            <li>
+                                <span>课程标准</span>
+                            </li>
+                            <li>
+                                <span>教材选用说明</span>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="right">
+                        <el-form ref="UploadFormRef" :model="UploadForm" :rules="Uprules">
+                            <ul>
+                                <li style="height: auto;">
+                                    <ul style="padding: 10px 0 0 10px;">
+                                        <span>请上传MP4 格式的视频，最多可上传12个视频，且单个视频文件大小不超过 500M</span>
+                                        <li
+                                            style="border-bottom: 0; border-top: 2px solid #F1F1F1; margin-top: 20px;padding-top: 20px;height: 170px">
+                                            <h3>团队1
+                                                <span>最多上传3个</span>
+                                            </h3>
+                                            <el-upload action="#" list-type="picture-card" :auto-upload="false"
+                                                :limit="3" class="changeSize" style="margin-top:20px">
+                                                <el-icon>
+                                                    <Plus />
+                                                </el-icon>
+
+                                                <template #file="{ file }">
+                                                    <div>
+                                                        <img class="el-upload-list__item-thumbnail" :src="file.url"
+                                                            alt="" />
+                                                        <span class="el-upload-list__item-actions">
+                                                            <span class="el-upload-list__item-preview"
+                                                                @click="handlePictureCardPreview(file)">
+                                                                <el-icon><zoom-in /></el-icon>
+                                                            </span>
+                                                            <span v-if="!disabled" class="el-upload-list__item-delete"
+                                                                @click="handleDownload(file)">
+                                                                <el-icon>
+                                                                    <Download />
+                                                                </el-icon>
+                                                            </span>
+                                                            <span v-if="!disabled" class="el-upload-list__item-delete"
+                                                                @click="handleRemove(file)">
+                                                                <el-icon>
+                                                                    <Delete />
+                                                                </el-icon>
+                                                            </span>
+                                                        </span>
+                                                    </div>
+                                                </template>
+                                            </el-upload>
+
+                                            <el-dialog v-model="dialogVisible">
+                                                <img w-full :src="dialogImageUrl" alt="Preview Image" />
+                                            </el-dialog>
+                                        </li>
+                                        <li
+                                            style="border-bottom: 0; border-top: 2px solid #F1F1F1; margin-top: 20px;padding-top: 20px;height: 170px">
+                                            <h3>团队2
+                                                <span>最多上传3个</span>
+                                            </h3>
+                                            <el-upload action="#" list-type="picture-card" :auto-upload="false"
+                                                :limit="3" class="changeSize" style="margin-top:20px">
+                                                <el-icon>
+                                                    <Plus />
+                                                </el-icon>
+
+                                                <template #file="{ file }">
+                                                    <div>
+                                                        <img class="el-upload-list__item-thumbnail" :src="file.url"
+                                                            alt="" />
+                                                        <span class="el-upload-list__item-actions">
+                                                            <span class="el-upload-list__item-preview"
+                                                                @click="handlePictureCardPreview(file)">
+                                                                <el-icon><zoom-in /></el-icon>
+                                                            </span>
+                                                            <span v-if="!disabled" class="el-upload-list__item-delete"
+                                                                @click="handleDownload(file)">
+                                                                <el-icon>
+                                                                    <Download />
+                                                                </el-icon>
+                                                            </span>
+                                                            <span v-if="!disabled" class="el-upload-list__item-delete"
+                                                                @click="handleRemove(file)">
+                                                                <el-icon>
+                                                                    <Delete />
+                                                                </el-icon>
+                                                            </span>
+                                                        </span>
+                                                    </div>
+                                                </template>
+                                            </el-upload>
+
+                                            <el-dialog v-model="dialogVisible">
+                                                <img w-full :src="dialogImageUrl" alt="Preview Image" />
+                                            </el-dialog>
+                                        </li>
+                                        <li
+                                            style="border-bottom: 0; border-top: 2px solid #F1F1F1; margin-top: 20px;padding-top: 20px;height: 170px">
+                                            <h3>团队3
+                                                <span>最多上传3个</span>
+                                            </h3>
+                                            <el-upload action="#" list-type="picture-card" :auto-upload="false"
+                                                :limit="3" class="changeSize" style="margin-top:20px">
+                                                <el-icon>
+                                                    <Plus />
+                                                </el-icon>
+
+                                                <template #file="{ file }">
+                                                    <div>
+                                                        <img class="el-upload-list__item-thumbnail" :src="file.url"
+                                                            alt="" />
+                                                        <span class="el-upload-list__item-actions">
+                                                            <span class="el-upload-list__item-preview"
+                                                                @click="handlePictureCardPreview(file)">
+                                                                <el-icon><zoom-in /></el-icon>
+                                                            </span>
+                                                            <span v-if="!disabled" class="el-upload-list__item-delete"
+                                                                @click="handleDownload(file)">
+                                                                <el-icon>
+                                                                    <Download />
+                                                                </el-icon>
+                                                            </span>
+                                                            <span v-if="!disabled" class="el-upload-list__item-delete"
+                                                                @click="handleRemove(file)">
+                                                                <el-icon>
+                                                                    <Delete />
+                                                                </el-icon>
+                                                            </span>
+                                                        </span>
+                                                    </div>
+                                                </template>
+                                            </el-upload>
+
+                                            <el-dialog v-model="dialogVisible">
+                                                <img w-full :src="dialogImageUrl" alt="Preview Image" />
+                                            </el-dialog>
+                                        </li>
+                                        <li
+                                            style="border-bottom: 0; border-top: 2px solid #F1F1F1; margin-top: 20px;padding: 20px 0 10px 0;height: 170px">
+                                            <h3>团队4
+                                                <span>最多上传3个</span>
+                                            </h3>
+                                            <el-upload action="#" list-type="picture-card" :auto-upload="false"
+                                                :limit="3" class="changeSize" style="margin-top:20px">
+                                                <el-icon>
+                                                    <Plus />
+                                                </el-icon>
+
+                                                <template #file="{ file }">
+                                                    <div>
+                                                        <img class="el-upload-list__item-thumbnail" :src="file.url"
+                                                            alt="" />
+                                                        <span class="el-upload-list__item-actions">
+                                                            <span class="el-upload-list__item-preview"
+                                                                @click="handlePictureCardPreview(file)">
+                                                                <el-icon><zoom-in /></el-icon>
+                                                            </span>
+                                                            <span v-if="!disabled" class="el-upload-list__item-delete"
+                                                                @click="handleDownload(file)">
+                                                                <el-icon>
+                                                                    <Download />
+                                                                </el-icon>
+                                                            </span>
+                                                            <span v-if="!disabled" class="el-upload-list__item-delete"
+                                                                @click="handleRemove(file)">
+                                                                <el-icon>
+                                                                    <Delete />
+                                                                </el-icon>
+                                                            </span>
+                                                        </span>
+                                                    </div>
+                                                </template>
+                                            </el-upload>
+
+                                            <el-dialog v-model="dialogVisible">
+                                                <img w-full :src="dialogImageUrl" alt="Preview Image" />
+                                            </el-dialog>
+                                        </li>
+                                    </ul>
+                                </li>
+                                <li>
+                                    <el-form-item prop="enlist">
+                                        <el-upload ref="uploadRef2" class="upload-demo" :limit="1" action=""
+                                            accept=".jpg, .png" :auto-upload="false"
+                                            v-model:file-list="ruleForm.publicity" :on-exceed="exceedFile"
+                                            :on-error="handleError" :on-success="handleSuccess"
+                                            :before-upload="beforeUPload">
+                                            <template #trigger>
+                                                <el-button type="primary" style="margin: 0 10px;">上传文件</el-button>
+                                            </template>
+                                            <span>请上传100M以内的文件</span>
+                                        </el-upload>
+                                    </el-form-item>
+                                </li>
+                                <li>
+                                    <el-form-item prop="enlist">
+                                        <el-upload ref="uploadRef2" class="upload-demo" :limit="1" action=""
+                                            accept=".jpg, .png" :auto-upload="false"
+                                            v-model:file-list="ruleForm.publicity" :on-exceed="exceedFile"
+                                            :on-error="handleError" :on-success="handleSuccess"
+                                            :before-upload="beforeUPload">
+                                            <template #trigger>
+                                                <el-button type="primary" style="margin: 0 10px;">上传文件</el-button>
+                                            </template>
+                                            <span>请上传100M以内的文件</span>
+                                        </el-upload>
+                                    </el-form-item>
+                                </li>
+                                <li>
+                                    <el-form-item prop="enlist">
+                                        <el-upload ref="uploadRef2" class="upload-demo" :limit="1" action=""
+                                            accept=".jpg, .png" :auto-upload="false"
+                                            v-model:file-list="ruleForm.publicity" :on-exceed="exceedFile"
+                                            :on-error="handleError" :on-success="handleSuccess"
+                                            :before-upload="beforeUPload">
+                                            <template #trigger>
+                                                <el-button type="primary" style="margin: 0 10px;">上传文件</el-button>
+                                            </template>
+                                            <span>请上传100M以内的文件</span>
+                                        </el-upload>
+                                    </el-form-item>
+                                </li>
+                                <li>
+                                    <el-form-item prop="enlist">
+                                        <el-upload ref="uploadRef2" class="upload-demo" :limit="1" action=""
+                                            accept=".jpg, .png" :auto-upload="false"
+                                            v-model:file-list="ruleForm.publicity" :on-exceed="exceedFile"
+                                            :on-error="handleError" :on-success="handleSuccess"
+                                            :before-upload="beforeUPload">
+                                            <template #trigger>
+                                                <el-button type="primary" style="margin: 0 10px;">上传文件</el-button>
+                                            </template>
+                                            <span>请上传100M以内的文件</span>
+                                        </el-upload>
+                                    </el-form-item>
+                                </li>
+                                <li>
+                                    <el-form-item prop="enlist">
+                                        <el-upload ref="uploadRef2" class="upload-demo" :limit="1" action=""
+                                            accept=".jpg, .png" :auto-upload="false"
+                                            v-model:file-list="ruleForm.publicity" :on-exceed="exceedFile"
+                                            :on-error="handleError" :on-success="handleSuccess"
+                                            :before-upload="beforeUPload">
+                                            <template #trigger>
+                                                <el-button type="primary" style="margin: 0 10px;">上传文件</el-button>
+                                            </template>
+                                            <span>请上传100M以内的文件</span>
+                                        </el-upload>
+                                    </el-form-item>
+                                </li>
+                            </ul>
+                        </el-form>
+                    </div>
+                </div>
+                <div class="upload_footer">
+                    <el-button type="primary" @click="ChangeNowIdx" size="large"
+                        style="margin: 0 30px; font-size: 20px; padding: 25px 60px;">
+                        上一步
+                    </el-button>
+                    <el-button type="primary" @click="SaveForm" size="large"
+                        style="margin: 0 30px; font-size: 20px; padding: 25px 60px;">
+                        保存
+                    </el-button>
+                    <el-button type="primary" @click="SubmitForm" size="large"
+                        style="margin: 0 30px; font-size: 20px; padding: 25px 60px;">
+                        提交
+                    </el-button>
+                </div>
             </div>
         </div>
     </div>
@@ -282,7 +652,7 @@ const submitForm = async (formEl: FormInstance | undefined) => {
 /* 公用 */
 .enroll {
     position: relative;
-    height: 1240px;
+    height: auto;
     width: 1240px;
     margin: 20px auto;
     background-color: #fff;
@@ -292,48 +662,54 @@ const submitForm = async (formEl: FormInstance | undefined) => {
     display: flex;
     justify-content: space-between;
     padding: 20px;
+    padding-bottom: 0;
     font-size: 20px;
 
     .leftbox {
-        background-color: #436EFF;
-        width: 60%;
+        /* background-color: #436EFF; */
+        width: 45%;
         padding: 10px;
         font-weight: bold;
-        color: white;
         text-align: center;
     }
 
     i {
         position: absolute;
         top: 19px;
-        right: 455px;
+        left: 562px;
         display: inline-block;
         width: 0;
         height: 0;
-        border-left: 25px solid #436EFF;
+        border-left: 25px solid;
         border-right: 25px solid transparent;
         border-top: 25px solid transparent;
         border-bottom: 25px solid transparent;
     }
 
     .rightbox {
-        background-color: #F1F1F1;
-        width: 40%;
+        width: 55%;
         padding: 10px;
         font-weight: bold;
-        color: black;
         text-align: center;
     }
 }
 
-.enroll_body {
-    position: absolute;
-    transition: opacity 0.5s;
+.active_head {
+    background-color: #436EFF;
+    color: white
+}
 
-    .box2 {
-        background-color: #436EFF;
-        z-index: 1;
-    }
+.active_i {
+    border-left-color: #436EFF !important;
+}
+
+.hidden_head {
+    background-color: #F1F1F1;
+    color: black;
+}
+
+.hidden_i {
+    border-left-color: #F1F1F1 !important;
 }
 
 /* 作品信息 */
@@ -346,7 +722,7 @@ const submitForm = async (formEl: FormInstance | undefined) => {
     display: flex;
     justify-content: center;
     width: 1200px;
-    margin: 10px auto;
+    margin: 50px auto;
 }
 
 .el-form-item--large {
@@ -368,4 +744,90 @@ const submitForm = async (formEl: FormInstance | undefined) => {
 }
 
 /* 上传信息 */
+
+.box2 {
+    width: 1200px;
+    height: 1250px;
+    margin-left: 20px;
+    border: 2px solid #F1F1F1;
+    border-top: none;
+}
+
+.upload_footer {
+    margin: 50px;
+    text-align: center;
+}
+
+.left {
+    float: left;
+    height: 100%;
+    width: 30%;
+    border-right: 2px solid #F1F1F1;
+
+    li {
+        height: 70px;
+        width: 100%;
+        border-bottom: 2px solid #F1F1F1;
+
+        span {
+            float: right;
+            margin: 0 20px;
+            line-height: 70px;
+            font-weight: bold;
+
+            &::before {
+                content: "*";
+                color: red;
+                margin-right: 5px;
+            }
+        }
+
+        &:first-child {
+            height: 888px;
+
+            span {
+                line-height: 888px;
+            }
+        }
+
+        &:last-child {
+            border-bottom: none;
+        }
+
+
+    }
+}
+
+.right {
+    float: left;
+    height: 100%;
+    width: 838px;
+
+    li {
+        height: 70px;
+        width: 100%;
+        border-bottom: 2px solid #F1F1F1;
+
+        &:first-child {
+            height: 645px;
+        }
+
+        &:last-child {
+            border-bottom: none;
+        }
+
+        span {
+            font-size: 12px;
+            color: #cbc9c9
+        }
+    }
+
+    .changeSize /deep/ .el-upload-list--picture-card {
+        --el-upload-list-picture-card-size: 120px !important;
+    }
+
+    .changeSize /deep/ .el-upload--picture-card {
+        --el-upload-picture-card-size: 120px !important;
+    }
+}
 </style>
