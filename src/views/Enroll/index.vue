@@ -5,8 +5,7 @@ import { ElMessage, ElMessageBox } from 'element-plus'
 import type { ComponentSize, FormInstance, FormRules, UploadInstance, UploadFile } from 'element-plus'
 
 // 公用模块
-const nowIdx = ref(1);
-const fa_height = ref(1240);
+const nowIdx = ref(0);
 const ChangeNowIdx = () => {
     if (nowIdx.value === 0)
         nowIdx.value = 1
@@ -249,11 +248,9 @@ const Uprules = reactive<FormRules<any>>({
     <div class="enroll">
         <!-- 填写作品信息模块 -->
         <div class="enroll_head">
-            <div class="leftbox" style="cursor: pointer;"
-                :class="{ active_head: nowIdx === 0, hidden_head: nowIdx === 1 }">填写作品信息</div>
+            <div class="leftbox" :class="{ active_head: nowIdx === 0, hidden_head: nowIdx === 1 }">填写作品信息</div>
             <i :class="{ active_i: nowIdx === 0, hidden_i: nowIdx === 1 }"></i>
-            <div class="rightbox" style="cursor: pointer;"
-                :class="{ active_head: nowIdx === 1, hidden_head: nowIdx === 0 }">上传参赛作品</div>
+            <div class="rightbox" :class="{ active_head: nowIdx === 1, hidden_head: nowIdx === 0 }">上传参赛作品</div>
         </div>
         <div class="enroll_body" style="height: auto;">
             <div v-show="nowIdx === 0" class="box1">
@@ -347,7 +344,7 @@ const Uprules = reactive<FormRules<any>>({
                         <el-form-item label="联系方式" prop="phone">
                             <el-input v-model="ruleForm.phone" placeholder="请填写联系方式" />
                         </el-form-item>
-                        submitForm(ruleFormRef)
+                        <!-- submitForm(ruleFormRef) -->
                         <el-form-item style="margin: 60px 209px;" class="is-required">
                             <el-button type="primary" @click="ChangeNowIdx"
                                 style=" font-size: 20px; padding: 25px 60px;">
@@ -649,185 +646,5 @@ const Uprules = reactive<FormRules<any>>({
 </template>
 
 <style scoped>
-/* 公用 */
-.enroll {
-    position: relative;
-    height: auto;
-    width: 1240px;
-    margin: 20px auto;
-    background-color: #fff;
-}
-
-.enroll_head {
-    display: flex;
-    justify-content: space-between;
-    padding: 20px;
-    padding-bottom: 0;
-    font-size: 20px;
-
-    .leftbox {
-        /* background-color: #436EFF; */
-        width: 45%;
-        padding: 10px;
-        font-weight: bold;
-        text-align: center;
-    }
-
-    i {
-        position: absolute;
-        top: 19px;
-        left: 562px;
-        display: inline-block;
-        width: 0;
-        height: 0;
-        border-left: 25px solid;
-        border-right: 25px solid transparent;
-        border-top: 25px solid transparent;
-        border-bottom: 25px solid transparent;
-    }
-
-    .rightbox {
-        width: 55%;
-        padding: 10px;
-        font-weight: bold;
-        text-align: center;
-    }
-}
-
-.active_head {
-    background-color: #436EFF;
-    color: white
-}
-
-.active_i {
-    border-left-color: #436EFF !important;
-}
-
-.hidden_head {
-    background-color: #F1F1F1;
-    color: black;
-}
-
-.hidden_i {
-    border-left-color: #F1F1F1 !important;
-}
-
-/* 作品信息 */
-.el-checkbox {
-    --el-checkbox-checked-text-color: none;
-
-}
-
-.enroll_form {
-    display: flex;
-    justify-content: center;
-    width: 1200px;
-    margin: 50px auto;
-}
-
-.el-form-item--large {
-    --font-size: 18px;
-}
-
-.form_qual {
-    .el-form-item--large {
-        --font-size: 15px;
-    }
-
-    .el-radio-group {
-        margin-left: 20px;
-    }
-
-    .el-checkbox__input {
-        flex: none
-    }
-}
-
-/* 上传信息 */
-
-.box2 {
-    width: 1200px;
-    height: 1250px;
-    margin-left: 20px;
-    border: 2px solid #F1F1F1;
-    border-top: none;
-}
-
-.upload_footer {
-    margin: 50px;
-    text-align: center;
-}
-
-.left {
-    float: left;
-    height: 100%;
-    width: 30%;
-    border-right: 2px solid #F1F1F1;
-
-    li {
-        height: 70px;
-        width: 100%;
-        border-bottom: 2px solid #F1F1F1;
-
-        span {
-            float: right;
-            margin: 0 20px;
-            line-height: 70px;
-            font-weight: bold;
-
-            &::before {
-                content: "*";
-                color: red;
-                margin-right: 5px;
-            }
-        }
-
-        &:first-child {
-            height: 888px;
-
-            span {
-                line-height: 888px;
-            }
-        }
-
-        &:last-child {
-            border-bottom: none;
-        }
-
-
-    }
-}
-
-.right {
-    float: left;
-    height: 100%;
-    width: 838px;
-
-    li {
-        height: 70px;
-        width: 100%;
-        border-bottom: 2px solid #F1F1F1;
-
-        &:first-child {
-            height: 645px;
-        }
-
-        &:last-child {
-            border-bottom: none;
-        }
-
-        span {
-            font-size: 12px;
-            color: #cbc9c9
-        }
-    }
-
-    .changeSize /deep/ .el-upload-list--picture-card {
-        --el-upload-list-picture-card-size: 120px !important;
-    }
-
-    .changeSize /deep/ .el-upload--picture-card {
-        --el-upload-picture-card-size: 120px !important;
-    }
-}
+@import url(./css/enrollCss.css);
 </style>

@@ -1,11 +1,12 @@
 <script setup>
 import { ref } from "vue";
+import Login from '@/views/Login/index.vue';
 
 const list = ref([
     { path: "/home/primarily", name: "首页" },
     { path: "/home/guide", name: "比赛指南" },
     { path: "/home/enroll", name: "我要报名" },
-    { path: "/home/expert", name: "专家评审" },
+    { path: "/home/expert", name: "进入专家评审" },
 ]);
 
 const curIdx = ref(-1);
@@ -13,10 +14,17 @@ const actIdx = ref(0);
 const isIndexActive = (index) => {
     return index === curIdx.value || index === actIdx.value;
 };
-const updateActiveIndex = (index) => {
-    actIdx.value = index;
-    // 将激活的索引保存到sessionStorage
-    sessionStorage.setItem('activeIndex', index);
+const isLogin = localStorage.getItem('isLogin');
+const updateActiveIndex = (route, index) => {
+    if ((route.name === '我要报名' || route.name === '进入专家评审') && !isLogin) {
+        showLogin.value = true;
+    }
+    else {
+        actIdx.value = index;
+        // 将激活的索引保存到sessionStorage
+        sessionStorage.setItem('activeIndex', index);
+    }
+
 };
 
 // 从sessionStorage获取激活的索引
@@ -24,6 +32,8 @@ const storedIndex = sessionStorage.getItem('activeIndex');
 if (storedIndex !== null) {
     actIdx.value = parseInt(storedIndex, 10);
 }
+
+const showLogin = ref(false)
 </script>
 <template>
     <div class="nav">
@@ -34,13 +44,11 @@ if (storedIndex !== null) {
             <div class="nav_column">
                 <routerLink :to="route.path" v-for="( route, index ) in  list" :key="index" class="link"
                     :class="{ active: isIndexActive(index) }" @mouseenter="curIdx = index" @mouseleave="curIdx = -1"
-                    @click="updateActiveIndex(index)">
+                    @click="updateActiveIndex(route, index)">
                     <span>{{ route.name }}</span>
                 </routerLink>
             </div>
-            <router-link to="/login" class="nav_login">
-                登录
-            </router-link>
+            <Login v-model="showLogin"></Login>
         </div>
     </div>
 </template>

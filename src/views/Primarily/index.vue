@@ -1,10 +1,22 @@
 <script setup>
-const ToEnroll = () => {
-    sessionStorage.setItem('activeIndex', 2);
+import Login from '@/views/Login/index.vue';
+import { ref } from 'vue';
+
+const isLogin = localStorage.getItem('isLogin')
+const showLogin = ref(false);
+const ToEnroll = (event) => {
+    if (isLogin) {
+        sessionStorage.setItem('activeIndex', 2);
+    }
+    else {
+        event.preventDefault();
+        showLogin.value = true;
+    }
 }
 const ToGuide = () => {
     sessionStorage.setItem('activeIndex', 1);
 }
+
 </script>
 
 <template>
@@ -96,6 +108,9 @@ const ToGuide = () => {
 
             </ul>
         </div>
+    </div>
+    <div v-show="showLogin">
+        <Login v-model="showLogin"></Login>
     </div>
 </template>
 
