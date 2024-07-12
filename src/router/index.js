@@ -42,6 +42,7 @@ const router = createRouter({
   }
 });
 
+
 //登录校验
 router.beforeEach((to, from, next) => {
   // const store = userInfoStore()

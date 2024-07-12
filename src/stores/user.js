@@ -14,17 +14,24 @@ export const userInfoStore = defineStore('user', () => {
     })
 
     //2.定义action函数获取数据
-    const getUserInfo = async ({ username, password }) => {
+    const getToken = async ({ username, password }) => {
         const res = await loginAPI({ username, password })
         if (res.token !== undefined) {
             localStorage.setItem("token", res.token);
-            localStorage.setItem("isLogin", true);
-            const useInfo = await getUserInfoAPI();
-            console.log(useInfo);
+            localStorage.setItem("isLogin", true)
         }
         else {
             localStorage.setItem("isLogin", false);
         }
+    }
+    const getUserInfo = async () => {
+        const res = await getUserInfoAPI()
+        console.log(res.dsUser);
+        userInfo.value.userId = res.dsUser.userId
+        userInfo.value.userType = res.dsUser.userType
+        userInfo.value.nickName = res.dsUser.nickName
+        userInfo.value.readFlag = res.dsUser.readFlag
+        userInfo.value.schoolName = res.dsUser.schoolName
     }
 
     //退出时清理用户信息
@@ -35,10 +42,14 @@ export const userInfoStore = defineStore('user', () => {
     //3.以对象格式把state和action return
     return {
         userInfo,
+        getToken,
         getUserInfo,
         clearUserInfo
     }
 },
     {
-        persist: true,
-    })
+        persist: {
+            enabled: true,
+        }
+    }
+)

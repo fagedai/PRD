@@ -24,7 +24,6 @@ const updateActiveIndex = (route, index) => {
         // 将激活的索引保存到sessionStorage
         sessionStorage.setItem('activeIndex', index);
     }
-
 };
 
 // 从sessionStorage获取激活的索引

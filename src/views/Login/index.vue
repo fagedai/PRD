@@ -1,9 +1,10 @@
 <script setup>
-import { reactive, ref } from 'vue'
+import { reactive, ref, toRaw } from 'vue'
 import { useRouter } from 'vue-router';
 import { userInfoStore } from '@/stores/user'
 import { ElMessage } from 'element-plus'
 import { ArrowDown } from '@element-plus/icons-vue'
+import { storeToRefs } from 'pinia'
 
 //正常登录
 const formLabelWidth = '140px'
@@ -17,21 +18,24 @@ const rules = {
     password: [{ required: true, message: "请输入密码", trigger: "blur" }],
 };
 const formRef = ref(null);
+
 const router = useRouter();
 const userStore = userInfoStore();
+const { userInfo } = storeToRefs(userStore);
 const doLogin = () => {
     const { username, password } = form
     //调用实例方法
     formRef.value.validate(async (valid) => {
         if (valid) {
-            await userStore.getUserInfo({ username, password })
+            await userStore.getToken({ username, password })
+            await userStore.getUserInfo()
             const isLogin = localStorage.getItem("isLogin") === "true"
             if (isLogin) {
                 // 1.提示用户
                 ElMessage({ type: 'success', message: '登陆成功' })
                 // 2.跳转首页
                 router.replace({ path: '/' })
-                setTimeout(() => kannoFn(), 2000)
+                // setTimeout(() => kannoFn(), 2000)
                 dialogFormVisible.value = false
             }
             else {
@@ -139,7 +143,7 @@ const changePass = () => {
             <el-dropdown>
                 <el-button style="border: 0;">
                     <i class="i_img"></i>
-                    <span>胡先锋</span>
+                    <span>{{ userInfo.nickName }}</span>
                     <el-icon class="el-icon--right"><arrow-down /></el-icon>
                 </el-button>
                 <template #dropdown>
