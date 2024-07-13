@@ -1,6 +1,11 @@
 <script setup>
 import { ref } from "vue";
 import Login from '@/views/Login/index.vue';
+import { userInfoStore } from '@/stores/user';
+import { storeToRefs } from 'pinia';
+
+const userStore = userInfoStore();
+const { userInfo } = storeToRefs(userStore);
 
 const list = ref([
     { path: "/home/primarily", name: "首页" },
@@ -14,7 +19,7 @@ const actIdx = ref(0);
 const isIndexActive = (index) => {
     return index === curIdx.value || index === actIdx.value;
 };
-const isLogin = localStorage.getItem('isLogin');
+const isLogin = localStorage.getItem('isLogin') === "true";
 const updateActiveIndex = (route, index) => {
     if ((route.name === '我要报名' || route.name === '进入专家评审') && !isLogin) {
         showLogin.value = true;
@@ -33,6 +38,7 @@ if (storedIndex !== null) {
 }
 
 const showLogin = ref(false)
+
 </script>
 <template>
     <div class="nav">
@@ -43,6 +49,7 @@ const showLogin = ref(false)
             <div class="nav_column">
                 <routerLink :to="route.path" v-for="( route, index ) in  list" :key="index" class="link"
                     :class="{ active: isIndexActive(index) }" @mouseenter="curIdx = index" @mouseleave="curIdx = -1"
+                    :style="{ 'display': ((userInfo.userType === 1 && route.name === '进入专家评审') || (userInfo.userType === 2 && route.name === '我要报名')) ? 'none' : '' }"
                     @click="updateActiveIndex(route, index)">
                     <span>{{ route.name }}</span>
                 </routerLink>
@@ -54,6 +61,10 @@ const showLogin = ref(false)
 
 
 <style scoped>
+.display_none {
+    display: none;
+}
+
 .nav {
     height: 60px;
     background-color: #fff;

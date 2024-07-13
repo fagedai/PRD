@@ -35,7 +35,7 @@ const doLogin = () => {
                 ElMessage({ type: 'success', message: '登陆成功' })
                 // 2.跳转首页
                 router.replace({ path: '/' })
-                // setTimeout(() => kannoFn(), 2000)
+                setTimeout(() => kannoFn(), 2000)
                 dialogFormVisible.value = false
             }
             else {
@@ -66,13 +66,15 @@ const dialogFormVisible = defineModel()
 const Quit = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('isLogin');
+    sessionStorage.setItem('activeIndex', '0')
+    userStore.clearUserInfo();
     ElMessage({
         message: "退出成功",
         type: "info",
         plain: true,
     });
     router.replace({ path: '/' })
-    setTimeout(() => kannoFn(), 2000)
+    setTimeout(() => kannoFn(), 1500)
 }
 
 //修改密码

@@ -30,7 +30,12 @@ const router = createRouter({
         {
           path: "/home/expert",
           name: 'expert',
-          component: () => import('@/views/Expert/index.vue')
+          component: () => import('@/views/Expert/index.vue'),
+        },
+        {
+          path: "/home/expert/score",
+          name: 'score',
+          component: () => import('@/views/Score/index.vue')
         }
       ]
     },
@@ -46,7 +51,7 @@ const router = createRouter({
 //登录校验
 router.beforeEach((to, from, next) => {
   // const store = userInfoStore()
-  let isLogin = localStorage.getItem('isLogin')
+  let isLogin = localStorage.getItem('isLogin') === "true"
   if (to.name !== 'primarily' && to.name !== 'guide' && !isLogin) {
     next({ name: from.name })
   } else {
