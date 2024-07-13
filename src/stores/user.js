@@ -11,6 +11,7 @@ export const userInfoStore = defineStore('user', () => {
         readFlag: null,
         nickName: null,
         schoolName: null,
+        approveType: null,
     })
 
     //2.定义action函数获取数据
@@ -32,11 +33,16 @@ export const userInfoStore = defineStore('user', () => {
         userInfo.value.nickName = res.dsUser.nickName
         userInfo.value.readFlag = res.dsUser.readFlag
         userInfo.value.schoolName = res.dsUser.schoolName
+        userInfo.value.approveType = res.dsUser.approveType
     }
 
     //退出时清理用户信息
     const clearUserInfo = () => {
-        userInfo.value = {}
+        userInfo.value.userId = null
+        userInfo.value.userType = null
+        userInfo.value.nickName = null
+        userInfo.value.readFlag = null
+        userInfo.value.schoolName = null
     }
 
     //3.以对象格式把state和action return

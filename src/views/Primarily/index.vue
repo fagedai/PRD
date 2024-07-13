@@ -1,12 +1,21 @@
 <script setup>
 import Login from '@/views/Login/index.vue';
 import { ref } from 'vue';
+import { userInfoStore } from '@/stores/user';
+import { storeToRefs } from 'pinia';
 
-const isLogin = localStorage.getItem('isLogin')
+const userStore = userInfoStore();
+const { userInfo } = storeToRefs(userStore);
+
+const isLogin = localStorage.getItem('isLogin') === 'true'
 const showLogin = ref(false);
 const ToEnroll = (event) => {
     if (isLogin) {
-        sessionStorage.setItem('activeIndex', 2);
+        if (userInfo.value.userType === 2) {
+            event.preventDefault();
+        }
+        else
+            sessionStorage.setItem('activeIndex', 2);
     }
     else {
         event.preventDefault();

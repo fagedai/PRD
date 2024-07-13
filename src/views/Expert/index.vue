@@ -1,8 +1,15 @@
 <script lang="ts" setup>
-import { ref, watch, onMounted } from 'vue'
+import { ref, watch, onMounted, toRaw } from 'vue'
 import { useRouter } from 'vue-router'
 import { getlistAPI } from '@/apis/paging'
+import { userInfoStore } from '@/stores/user';
+import { storeToRefs } from 'pinia';
 
+const userStore = userInfoStore();
+const { userInfo } = storeToRefs(userStore);
+let list = ["思政课组", "公共基础课程组", "专业技能课程⼀组", "专业技能课程二组"]
+
+//不同意跳转
 const router = useRouter()
 const dialogVisible = ref(false)
 
@@ -13,11 +20,6 @@ const cancel = () => {
     setTimeout(() => { location.reload() }, 10)
 }
 
-// const setCellColor = ({ row, column, rowIndex, columnIndex }) => {
-//     if (columnIndex === 3) {
-//         return 'color:#239ce6;';
-//     }
-// }
 
 //查询
 //名称
@@ -42,56 +44,39 @@ const options = [
 
 //作品展示
 const pageSize = ref(10)
-const currentPage = ref(1)
+const pageNum = ref(1)
 const handleSizeChange = (val) => {
     pageSize.value = val
 }
 const handleCurrentChange = (val) => {
-    currentPage.value = val
+    pageNum.value = val
 }
-const opus = [
-    {
-        id: 1,
-        name: 'Tom',
-        date: '2016-05-03',
-        score: '未得分',
-        oper: '评分'
-    },
-    {
-        id: 1,
-        name: 'Tom',
-        date: '2016-05-03',
-        score: '未得分',
-        oper: '评分'
-    },
-    {
-        id: 1,
-        name: 'Tom',
-        date: '2016-05-03',
-        score: '未得分',
-        oper: '评分'
-    },
-    {
-        id: 1,
-        name: 'Tom',
-        date: '2016-05-03',
-        score: '未得分',
-        oper: '评分'
-    },
-]
+const opus = ref([])
 
 //获取列表
 const getlist = async () => {
-    const res = await getlistAPI({
-        currentPage,
-        pageSize,
-        isApprove,
-        title
-    })
-    console.log(res);
+    try {
+        const res = await getlistAPI({
+            pageNum: pageNum.value,
+            pageSize: pageSize.value,
+            isApprove: isApprove.value,
+            title: title.value,
+        });
+        opus.value = res.data.rows
+    } catch (error) {
+        console.error('获取列表数据时发生错误:', error);
+    }
 
 }
 onMounted(() => getlist());
+
+
+
+///test
+const get = (id) => {
+    console.log(id);
+
+}
 </script>
 <template>
     <el-dialog v-model="dialogVisible" title="承诺书" width="1183" :center="true" :close-on-click-modal="false"
@@ -141,7 +126,7 @@ onMounted(() => getlist());
     <div class="expert">
         <div class="expert_head">
             <h3>专家评审你好！</h3>
-            <h4>您评审的分类为：专业技能课程二组</h4>
+            <h4>您评审的分类为：{{ list[userInfo.approveType] }}</h4>
         </div>
         <div class="expert_body">
             <div class="body_select">
@@ -155,16 +140,23 @@ onMounted(() => getlist());
                 </div>
             </div>
             <div class="body_show">
-                <el-table :data="opus.slice((currentPage - 1) * pageSize, currentPage * pageSize)" style="width: 100%"
+                <el-table :data="opus.slice((pageNum - 1) * pageSize, pageNum * pageSize)" style="width: 100%"
                     :header-cell-style="{ 'background-color': '#F1F3F8', 'color': '#000' }">
-                    <el-table-column prop="id" label="序号" width="100" />
-                    <el-table-column prop="name" label="作品名称" width="455" />
-                    <el-table-column prop="date" label="提交时间" width="200" />
-                    <el-table-column prop="score" label="得分" width="180" />
-                    <el-table-column prop="oper" label="操作" width="180" />
+                    <el-table-column prop="itemId" label="序号" width="100" />
+                    <el-table-column prop="title" label="作品名称" width="455" />
+                    <el-table-column prop="updateTime" label="提交时间" width="200" />
+                    <el-table-column prop="course" label="得分" width="180">
+                        <text style="color: red;">未评分</text>
+                    </el-table-column>
+                    <el-table-column fixed="right" label="操作">
+                        <template #default="{ row }">
+                            <RouterLink :to="{ path: '/home/expert/score', query: { itemId: row.itemId } }"
+                                style="color: #436EFF;">评分</RouterLink>
+                        </template>
+                    </el-table-column>
                 </el-table>
                 <div class="paging">
-                    <el-pagination :current-page="currentPage" :page-size="pageSize" :page-sizes="[10]"
+                    <el-pagination :current-page="pageNum" :page-size="pageSize" :page-sizes="[10]"
                         layout="total, prev, pager, next, jumper" :total="opus.length" @size-change="handleSizeChange"
                         @current-change="handleCurrentChange" />
                 </div>
@@ -235,9 +227,5 @@ onMounted(() => getlist());
             }
         }
     }
-}
-
-.body_show /deep/ .el-table__row .el-table_1_column_4 div {
-    color: red;
 }
 </style>
