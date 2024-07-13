@@ -1,42 +1,50 @@
 <script lang="ts" setup>
-import { ref, watch, onMounted, toRaw } from 'vue'
+import { ref, onMounted, watchEffect, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { getlistAPI } from '@/apis/paging'
 import { userInfoStore } from '@/stores/user';
 import { storeToRefs } from 'pinia';
 
+//获取用户数据
 const userStore = userInfoStore();
+const router = useRouter()
 const { userInfo } = storeToRefs(userStore);
 let list = ["思政课组", "公共基础课程组", "专业技能课程⼀组", "专业技能课程二组"]
+const dialogVisible = ref(userInfo.value.readFlag === 0)
+
+//同意
+const Agree = () => {
+    dialogVisible.value = false;
+    userStore.isRead()
+}
 
 //不同意跳转
-const router = useRouter()
-const dialogVisible = ref(false)
-
 const cancel = () => {
     router.replace({ path: "/" })
-    dialogVisible.value = false
+    dialogVisible.value = false;
     sessionStorage.setItem('activeIndex', '0')
     setTimeout(() => { location.reload() }, 10)
 }
-
 
 //查询
 //名称
 const title = ref('')
 
 //状态
-const isApprove = ref('')
+const isProve = ref('')
 const options = [
     {
+        id: 0,
         value: '',
         label: '全部',
     },
     {
+        id: 1,
         value: '0',
         label: '未评审',
     },
     {
+        id: 2,
         value: '1',
         label: '已评审',
     },
@@ -51,32 +59,29 @@ const handleSizeChange = (val) => {
 const handleCurrentChange = (val) => {
     pageNum.value = val
 }
-const opus = ref([])
 
 //获取列表
+const opus = ref([])
 const getlist = async () => {
     try {
         const res = await getlistAPI({
             pageNum: pageNum.value,
             pageSize: pageSize.value,
-            isApprove: isApprove.value,
+            isApprove: isProve.value,
             title: title.value,
         });
         opus.value = res.data.rows
     } catch (error) {
         console.error('获取列表数据时发生错误:', error);
     }
-
 }
-onMounted(() => getlist());
-
-
-
-///test
-const get = (id) => {
-    console.log(id);
-
+const getStatus = (isApprove) => {
+    return isApprove === '' ? '未评分' : '已评分';
 }
+watchEffect(async () => {
+    await getlist();
+})
+
 </script>
 <template>
     <el-dialog v-model="dialogVisible" title="承诺书" width="1183" :center="true" :close-on-click-modal="false"
@@ -116,7 +121,7 @@ const get = (id) => {
         </span>
         <template #footer>
             <div class="dialog-footer">
-                <el-button type="primary" @click="dialogVisible = false" style="font-size: 16px;padding: 20px;">
+                <el-button type="primary" @click="Agree" style="font-size: 16px;padding: 20px;">
                     我已阅读并同意
                 </el-button>
                 <el-button @click="cancel" style="font-size: 16px;padding: 20px;">不同意</el-button>
@@ -134,7 +139,7 @@ const get = (id) => {
                 <div><el-input v-model="title" style="width: 240px" /></div>
                 <h4>状态</h4>
                 <div>
-                    <el-select v-model="isApprove" placeholder="请选择" style="width: 240px">
+                    <el-select v-model="isProve" placeholder="" style="width: 240px">
                         <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value" />
                     </el-select>
                 </div>
@@ -146,7 +151,9 @@ const get = (id) => {
                     <el-table-column prop="title" label="作品名称" width="455" />
                     <el-table-column prop="updateTime" label="提交时间" width="200" />
                     <el-table-column prop="course" label="得分" width="180">
-                        <text style="color: red;">未评分</text>
+                        <template #default="{ row }">
+                            <text style="color: red;">{{ getStatus(row.isApprove) }}</text>
+                        </template>
                     </el-table-column>
                     <el-table-column fixed="right" label="操作">
                         <template #default="{ row }">
