@@ -35,6 +35,10 @@ export const userInfoStore = defineStore('user', () => {
         userInfo.value.schoolName = res.dsUser.schoolName
         userInfo.value.approveType = res.dsUser.approveType
     }
+    const isRead = () => {
+        userInfo.value.readFlag = 1;
+    }
+
 
     //退出时清理用户信息
     const clearUserInfo = () => {
@@ -50,6 +54,7 @@ export const userInfoStore = defineStore('user', () => {
         userInfo,
         getToken,
         getUserInfo,
+        isRead,
         clearUserInfo
     }
 },

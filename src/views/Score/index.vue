@@ -1,87 +1,219 @@
 <script setup>
-import { useRoute } from 'vue-router';
-import { ref, computed } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
+import { ref, computed, watchEffect } from 'vue';
+import { getWorksNameAPI, getWorksSubmitAPI, postItemScoreAPI } from '@/apis/paging';
 
 //获取数据
 const route = useRoute()
-console.log(route.query)
+const router = useRouter()
+
+//刷新页面
+function kannoFn() {
+    location.reload();
+}
+
+//获取作品名称等
+const data_name = ref(null)
+const getWorksName = async () => {
+    try {
+        const res = await getWorksNameAPI(route.query.itemId)
+        data_name.value = res.data;
+    } catch (error) {
+        console.error('获取列表数据时发生错误:', error);
+    }
+
+}
+
+//获取作品提交等
+const data_submit = ref(null)
+const maplist = ref(null)
+const jiaoan = ref(null)
+const baogao = ref(null)
+const fangan = ref(null)
+const biaozhun = ref(null)
+const shuoming = ref(null)
+const getWorksSubmit = async () => {
+    try {
+        const res = await getWorksSubmitAPI({
+            pageNum: 1,
+            pageSize: 999,
+            itemId: route.query.itemId
+        })
+        data_submit.value = res.data.map(item => ({
+            ...item,
+            url: item.url.startsWith('https://login') ? item.url : `http://reg.vip.cpolar.cn${item.url}`
+        }));
+        maplist.value = data_submit.value.filter(item => item.fileType === 1 && item.subTitle !== '')
+        jiaoan.value = data_submit.value.filter(item => item.fileType === 2 && item.keyWord === 'jiaoan')
+        baogao.value = data_submit.value.filter(item => item.fileType === 2 && item.keyWord === 'baogao')
+        fangan.value = data_submit.value.filter(item => item.fileType === 2 && item.keyWord === 'fangan')
+        biaozhun.value = data_submit.value.filter(item => item.fileType === 2 && item.keyWord === 'biaozhun')
+        shuoming.value = data_submit.value.filter(item => item.fileType === 2 && item.keyWord === 'shuoming')
+    } catch (error) {
+        console.error('获取列表数据时发生错误:', error);
+    }
+}
+watchEffect(async () => {
+    await getWorksName();
+    await getWorksSubmit();
+})
 
 //绑定表格得分
 const list = ref(['', '', '', '', '', ''])
+const suggestion = ref('')
 const totalScore = computed(() => {
     return list.value.reduce((sum, item) => {
         const num = parseFloat(item);
         return isNaN(num) ? sum : sum + num;
     }, 0);
 });
-const suggestion = ref('')
 
-const get = () => {
-    console.log(1);
+//上一个
+const ToLast = () => {
+    setTimeout(() => kannoFn(), 1000)
+    router.replace({ path: '/home/expert/score', query: { itemId: Number(route.query.itemId) - 1 } })
 }
+
+//提交表格得分
+//保存
+const postItemScore = async () => {
+    try {
+        await postItemScoreAPI({
+            itemId: route.query.itemId,
+            mark: suggestion.value,
+            dimension1: list.value[0],
+            dimension2: list.value[1],
+            dimension3: list.value[2],
+            dimension4: list.value[3],
+            dimension5: list.value[4],
+            dimension6: list.value[5]
+        })
+        ElMessage.success('保存成功')
+        router.replace({ path: '/home/expert' })
+        setTimeout(() => kannoFn(), 1500)
+    } catch (error) {
+        console.error('获取列表数据时发生错误:', error);
+    }
+}
+//保存并到下一个
+const postItemScoreToNext = async () => {
+    try {
+        await postItemScoreAPI({
+            itemId: route.query.itemId,
+            mark: suggestion.value,
+            dimension1: list.value[0],
+            dimension2: list.value[1],
+            dimension3: list.value[2],
+            dimension4: list.value[3],
+            dimension5: list.value[4],
+            dimension6: list.value[5]
+        })
+        ElMessage.success('保存成功')
+        setTimeout(() => kannoFn(), 1500)
+        router.replace({ path: '/home/expert/score', query: { itemId: Number(route.query.itemId) + 1 } })
+    } catch (error) {
+        console.error('获取列表数据时发生错误:', error);
+    }
+}
+
 </script>
 
 <template>
     <div class="score">
         <div class="score_head">
-            <p>首页 > 专家评审 > 我叫MT</p>
+            <p>
+                <router-link to="/" @click="setTimeout(() => kannoFn(), 1000)">首页</router-link>
+                >
+                <router-link to="/home/expert" @click="setTimeout(() => kannoFn(), 1000)">专家评审</router-link>
+                > {{ data_name?.title }}
+            </p>
         </div>
         <div class="score_body1">
-            <h1 style="margin-bottom: 10px;">我叫MT</h1>
-            <span style="margin-right: 20px">所属分类：公共基础课程组（不含思政）</span>
-            <span>提交时间：2023-11-5</span>
+            <h1 style="margin-bottom: 10px;">{{ data_name?.title }}</h1>
+            <span style="margin-right: 20px">所属分类：{{ data_name?.classOneName }}</span>
+            <span>提交时间：{{ data_name?.updateTime }}</span>
             <table>
                 <tr>
                     <td><span>课堂实录</span></td>
-                    <td>1</td>
+                    <td>
+                        <ul>
+                            <li v-for="item in maplist" :key="item.subId" style="float: left; margin:0 20px 10px 0;">
+                                <video style="height: 165px" controls :src="item.url"></video>
+                                <p style="text-align: center;">{{ item.subTitle }}</p>
+                            </li>
+                        </ul>
+                        <!-- <video style="height: 165px" controls
+                            src="http://reg.vip.cpolar.cn/profile/upload/2024/07/11/反恐精英：全球攻势 2024-06-26 20-21-31_20240711160049A276.mp4">
+                        </video> -->
+                    </td>
                 </tr>
                 <tr>
                     <td><span>教案</span></td>
                     <td>
-                        <div></div>
+                        <div class="fileShow">
+                            <i></i>
+                            <div style="float: right;margin: 10px 0;"><a :href="jiaoan[0].url"
+                                    style="margin: auto 0;">{{ jiaoan[0]?.subTitle }}</a></div>
+                        </div>
                         <div class="download" @click="get">
                             <i></i>
-                            <span>下载</span>
+                            <a :href="jiaoan[0].url" download>下载</a>
                         </div>
                     </td>
                 </tr>
                 <tr>
                     <td><span>教学实施报告</span></td>
                     <td>
-                        <div></div>
+                        <div class="fileShow">
+                            <i></i>
+                            <div style="float: right;margin: 10px 0;"><a :href="baogao[0].url"
+                                    style="margin: auto 0;">{{ baogao[0]?.subTitle }}</a></div>
+                        </div>
                         <div class="download">
                             <i></i>
-                            <span>下载</span>
+                            <a :href="baogao[0].url" download>下载</a>
                         </div>
                     </td>
                 </tr>
                 <tr>
                     <td><span>专业人才培养方案</span></td>
                     <td>
-                        <div></div>
+                        <div class="fileShow">
+                            <i></i>
+                            <div style="float: right;margin: 10px 0;"><a :href="fangan[0].url"
+                                    style="margin: auto 0;">{{ fangan[0]?.subTitle }}</a></div>
+                        </div>
                         <div class="download">
                             <i></i>
-                            <span>下载</span>
+                            <a :href="fangan[0].url" download>下载</a>
                         </div>
                     </td>
                 </tr>
                 <tr>
                     <td><span>课程标准</span></td>
                     <td>
-                        <div></div>
+                        <div class="fileShow">
+                            <i></i>
+                            <div style="float: right;margin: 10px 0;"><a :href="biaozhun[0].url"
+                                    style="margin: auto 0;">{{ biaozhun[0]?.subTitle }}</a></div>
+                        </div>
                         <div class="download">
                             <i></i>
-                            <span>下载</span>
+                            <a :href="biaozhun[0].url" download>下载</a>
                         </div>
                     </td>
                 </tr>
                 <tr>
                     <td><span>教材选用说明</span></td>
                     <td>
-                        <div></div>
+                        <div class="fileShow">
+                            <i></i>
+                            <div style="float: right;margin: 10px 0;"><a :href="shuoming[0].url"
+                                    style="margin: auto 0;">{{ shuoming[0]?.subTitle }}</a></div>
+                        </div>
                         <div class="download">
                             <i></i>
-                            <span>下载</span>
+                            <a :href="shuoming[0].url" download>下载</a>
                         </div>
                     </td>
                 </tr>
@@ -194,13 +326,13 @@ const get = () => {
             <h4 style="margin: 20px 0;">评审意见</h4>
             <el-input v-model="suggestion" style="width: 1194px" :rows="4" type="textarea" placeholder="请输入" />
             <div class="score_footer">
-                <el-button type="primary" @click="ChangeNowIdx" size="large">
+                <el-button type="primary" @click="ToLast" size="large">
                     上一步
                 </el-button>
-                <el-button type="primary" @click="ChangeNowIdx" size="large">
+                <el-button type="primary" @click="postItemScore" size="large">
                     保存
                 </el-button>
-                <el-button type="primary" @click="ChangeNowIdx" size="large">
+                <el-button type="primary" @click="postItemScoreToNext" size="large">
                     保存并评审下一个
                 </el-button>
             </div>
@@ -244,9 +376,25 @@ const get = () => {
                     width: 25%;
                 }
 
+                .fileShow {
+                    float: left;
+
+                    i {
+                        display: inline-block;
+                        height: 30px;
+                        width: 30px;
+                        background-image: url('@/assets/PC端_slices/PdfType.png');
+                        background-size: contain;
+                        background-repeat: no-repeat;
+                        margin-right: 5px;
+                        margin-top: 5px;
+                    }
+                }
+
                 .download {
                     float: right;
                     cursor: pointer;
+                    margin: 10px 0;
 
                     i {
                         display: inline-block;
@@ -259,7 +407,7 @@ const get = () => {
                         margin-top: 5px;
                     }
 
-                    span {
+                    a {
                         color: #879EC2;
                     }
                 }
