@@ -35,5 +35,6 @@ declare module 'vue' {
     ElUpload: typeof import('element-plus/es')['ElUpload']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
+    UploadVideo: typeof import('./src/components/UploadVideo.vue')['default']
   }
 }

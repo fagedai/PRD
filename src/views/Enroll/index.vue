@@ -1,14 +1,14 @@
 <script lang="ts" setup>
 import { reactive, ref, watchEffect, watch } from 'vue'
-import { Delete, Plus } from '@element-plus/icons-vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import type { ComponentSize, FormInstance, FormRules, UploadInstance, UploadFile } from 'element-plus'
-import { UploadErollRecord } from '@/apis/enroll'
+import type { ComponentSize, FormInstance, FormRules } from 'element-plus'
+import { UploadErollRecord, UploadErollMes } from '@/apis/enroll'
 import { userInfoStore } from '@/stores/user'
+import UploadVideo from '@/components/UploadVideo.vue'
 
 /////////////////// 公用模块 /////////////////////////
 ///切换板块////
-const nowIdx = ref(1);
+const nowIdx = ref(0);
 const ChangeNowIdx = () => {
     if (nowIdx.value === 0)
         nowIdx.value = 1
@@ -51,6 +51,8 @@ const handleSuccess = () => {
 // 文件上传
 const uploadFile = async (upfile: any) => {
     let file = upfile.file[0].raw
+    console.log(file);
+
     await UploadErollRecord(file).then((res: any) => {
         console.log(res);
 
@@ -213,75 +215,151 @@ const NextForm = (formEl: FormInstance | undefined) => {
 ///////table内容//////
 const dialogImageUrl = ref('')
 const dialogVisible = ref(false)
-const disabled = ref(false)
 
-const handleRemove = (file: UploadFile) => {
-    UploadForm.value.vedio = UploadForm.value.vedio.filter((item: UploadFile) => item !== file);
-}
-
-const SaveForm = () => {
-    ElMessage.success('已保存！');
-}
-const SubmitForm = () => {
-    ElMessage.success('提交成功！');
-}
-
-//上传数据保存处
+//////上传数据保存处//////
 const UploadFormRef = ref<FormInstance>()
 const UploadForm = reactive<any>({
-    vedio: [],
-    teachPlan: [],
-    report: [],
-    schemePlan: [],
-    standard: [],
-    explain: []
+    vedio: '',
+    jiaoan: {
+        file: [],
+        res: null,
+    },
+    baogao: {
+        file: [],
+        res: null,
+    },
+    fangan: {
+        file: [],
+        res: null,
+    },
+    biaozhun: {
+        file: [],
+        res: null,
+    },
+    shuoming: {
+        file: [],
+        res: null,
+    }
 })
 const Uprules = reactive<FormRules<any>>({
     vedio: [
         {
             required: true,
-            message: '请上传参赛报名表',
+            message: '请上传视频',
             trigger: 'blur',
         },
     ],
-    teachPlan: [
+    jiaoan: [
         {
             required: true,
             message: '请上传教案',
             trigger: 'blur',
         },
     ],
-    report: [
+    baogao: [
+        {
+            required: true,
+            message: '请上传教学实施报告',
+            trigger: 'blur',
+        },
+    ],
+    fangan: [
         {
             required: true,
             message: '请上传专业人才培养方案',
             trigger: 'blur',
         },
     ],
-    schemePlan: [
+    biaozhun: [
         {
             required: true,
-            message: '请上传课程标准',
+            message: '请上传教材课程标准',
             trigger: 'blur',
         },
     ],
-    standard: [
+    shuoming: [
         {
             required: true,
             message: '请上传教材选用说明',
             trigger: 'blur',
         },
     ],
-    explain: [
-        {
-            required: true,
-            message: '请上传参赛报名表',
-            trigger: 'blur',
-        },
-    ],
 })
 
+//判断是否有上传视频
+const checkForm = reactive<any>({
+    url1: '',
+    url2: '',
+    url3: '',
+    url4: '',
+    url5: '',
+    url6: '',
+    url7: '',
+    url8: '',
+    url9: '',
+    url10: '',
+    url11: '',
+    url12: '',
+})
 
+//添加上传文件函数
+const addFile = () => {
+    ruleForm.dsItemSubList.push({
+        keyWord: "jiaoan",
+        url: UploadForm.jiaoan.res.url,
+        fileType: 2,
+        subTitle: "教案⽂档.pdf"
+    })
+    ruleForm.dsItemSubList.push({
+        keyWord: "baogao",
+        url: UploadForm.baogao.res.url,
+        fileType: 2,
+        subTitle: "报告⽂档.pdf"
+    })
+    ruleForm.dsItemSubList.push({
+        keyWord: "fangan",
+        url: UploadForm.fangan.res.url,
+        fileType: 2,
+        subTitle: "方案⽂档.pdf"
+    })
+    ruleForm.dsItemSubList.push({
+        keyWord: "biaozhun",
+        url: UploadForm.biaozhun.res.url,
+        fileType: 2,
+        subTitle: "标准⽂档.pdf"
+    })
+    ruleForm.dsItemSubList.push({
+        keyWord: "shuoming",
+        url: UploadForm.shuoming.res.url,
+        fileType: 2,
+        subTitle: "说明⽂档.pdf"
+    })
+}
+//保存
+const SaveForm = (formEl: FormInstance | undefined) => {
+    const temp = Object.values(checkForm).filter(item => item !== '').map((itemurl, index) => ({
+        keyWord: `vedio${index + 1}`, // 使用正确的索引，从1开始
+        url: itemurl,
+        fileType: 1,
+        subTitle: "da.mp4"
+    }));
+    // 设置UploadForm的vedio属性
+    UploadForm.vedio = temp.length > 0;
+    if (!formEl) return;
+    formEl.validate(async (valid) => {
+        if (valid) {
+            addFile()
+            temp.forEach(item => ruleForm.dsItemSubList.push(item))
+            console.log(ruleForm)
+            await UploadErollMes(ruleForm)
+            ElMessage.success('已保存！');
+        }
+    })
+
+}
+const SubmitForm = () => {
+    ElMessage.success('提交成功！');
+}
 
 </script>
 
@@ -404,6 +482,7 @@ const Uprules = reactive<FormRules<any>>({
             <!-- 上传参赛作品模块 -->
             <div v-show="nowIdx === 1" style="padding-bottom:10px">
                 <div class="box2 upload_head">
+
                     <div class="left">
                         <ul>
                             <li>
@@ -434,125 +513,31 @@ const Uprules = reactive<FormRules<any>>({
                                         <span>请上传MP4 格式的视频，最多可上传12个视频，且单个视频文件大小不超过 500M</span>
                                         <li
                                             style="border-bottom: 0; border-top: 2px solid #F1F1F1; margin-top: 20px;padding-top: 20px;height: 170px">
-                                            <h3>团队1
-                                                <span>最多上传3个</span>
-                                            </h3>
-                                            <el-upload action="#" list-type="picture-card" :auto-upload="false"
-                                                :file-list="UploadForm.vedio" :limit="3" class="changeSize"
-                                                style="margin-top:20px">
-                                                <el-icon>
-                                                    <Plus />
-                                                </el-icon>
-
-                                                <template #file="{ file }">
-                                                    <div>
-                                                        <img class="el-upload-list__item-thumbnail" :src="file.url"
-                                                            alt="" />
-                                                        <span class="el-upload-list__item-actions">
-                                                            <span v-if="!disabled" class="el-upload-list__item-delete"
-                                                                @click="handleRemove(file)">
-                                                                <el-icon>
-                                                                    <Delete />
-                                                                </el-icon>
-                                                            </span>
-                                                        </span>
-                                                    </div>
-                                                </template>
-                                            </el-upload>
-
-                                            <el-dialog v-model="dialogVisible">
-                                                <img w-full :src="dialogImageUrl" alt="Preview Image" />
-                                            </el-dialog>
+                                            <h3>团队1</h3>
+                                            <UploadVideo v-model="checkForm.url1"></UploadVideo>
+                                            <UploadVideo v-model="checkForm.url2"></UploadVideo>
+                                            <UploadVideo v-model="checkForm.url3"></UploadVideo>
                                         </li>
                                         <li
                                             style="border-bottom: 0; border-top: 2px solid #F1F1F1; margin-top: 20px;padding-top: 20px;height: 170px">
-                                            <h3>团队2
-                                                <span>最多上传3个</span>
-                                            </h3>
-                                            <el-upload action="#" list-type="picture-card" :auto-upload="false"
-                                                :limit="3" class="changeSize" style="margin-top:20px">
-                                                <el-icon>
-                                                    <Plus />
-                                                </el-icon>
-
-                                                <template #file="{ file }">
-                                                    <div>
-                                                        <img class="el-upload-list__item-thumbnail" :src="file.url"
-                                                            alt="" />
-                                                        <span class="el-upload-list__item-actions">
-                                                            <span v-if="!disabled" class="el-upload-list__item-delete"
-                                                                @click="handleRemove(file)">
-                                                                <el-icon>
-                                                                    <Delete />
-                                                                </el-icon>
-                                                            </span>
-                                                        </span>
-                                                    </div>
-                                                </template>
-                                            </el-upload>
-
-                                            <el-dialog v-model="dialogVisible">
-                                                <img w-full :src="dialogImageUrl" alt="Preview Image" />
-                                            </el-dialog>
+                                            <h3>团队2</h3>
+                                            <UploadVideo v-model="checkForm.url4"></UploadVideo>
+                                            <UploadVideo v-model="checkForm.url5"></UploadVideo>
+                                            <UploadVideo v-model="checkForm.url6"></UploadVideo>
                                         </li>
                                         <li
                                             style="border-bottom: 0; border-top: 2px solid #F1F1F1; margin-top: 20px;padding-top: 20px;height: 170px">
-                                            <h3>团队3
-                                                <span>最多上传3个</span>
-                                            </h3>
-                                            <el-upload action="#" list-type="picture-card" :auto-upload="false"
-                                                :limit="3" class="changeSize" style="margin-top:20px">
-                                                <el-icon>
-                                                    <Plus />
-                                                </el-icon>
-
-                                                <template #file="{ file }">
-                                                    <div>
-                                                        <img class="el-upload-list__item-thumbnail" :src="file.url"
-                                                            alt="" />
-                                                        <span class="el-upload-list__item-actions">
-                                                            <span v-if="!disabled" class="el-upload-list__item-delete"
-                                                                @click="handleRemove(file)">
-                                                                <el-icon>
-                                                                    <Delete />
-                                                                </el-icon>
-                                                            </span>
-                                                        </span>
-                                                    </div>
-                                                </template>
-                                            </el-upload>
-
-                                            <el-dialog v-model="dialogVisible">
-                                                <img w-full :src="dialogImageUrl" alt="Preview Image" />
-                                            </el-dialog>
+                                            <h3>团队3</h3>
+                                            <UploadVideo v-model="checkForm.url7"></UploadVideo>
+                                            <UploadVideo v-model="checkForm.url8"></UploadVideo>
+                                            <UploadVideo v-model="checkForm.url9"></UploadVideo>
                                         </li>
                                         <li
                                             style="border-bottom: 0; border-top: 2px solid #F1F1F1; margin-top: 20px;padding: 20px 0 10px 0;height: 170px">
-                                            <h3>团队4
-                                                <span>最多上传3个</span>
-                                            </h3>
-                                            <el-upload action="#" list-type="picture-card" :auto-upload="false"
-                                                :limit="3" class="changeSize" style="margin-top:20px">
-                                                <el-icon>
-                                                    <Plus />
-                                                </el-icon>
-
-                                                <template #file="{ file }">
-                                                    <div>
-                                                        <img class="el-upload-list__item-thumbnail" :src="file.url"
-                                                            alt="" />
-                                                        <span class="el-upload-list__item-actions">
-                                                            <span v-if="!disabled" class="el-upload-list__item-delete"
-                                                                @click="handleRemove(file)">
-                                                                <el-icon>
-                                                                    <Delete />
-                                                                </el-icon>
-                                                            </span>
-                                                        </span>
-                                                    </div>
-                                                </template>
-                                            </el-upload>
-
+                                            <h3>团队4</h3>
+                                            <UploadVideo v-model="checkForm.url10"></UploadVideo>
+                                            <UploadVideo v-model="checkForm.url11"></UploadVideo>
+                                            <UploadVideo v-model="checkForm.url12"></UploadVideo>
                                             <el-dialog v-model="dialogVisible">
                                                 <img w-full :src="dialogImageUrl" alt="Preview Image" />
                                             </el-dialog>
@@ -560,68 +545,91 @@ const Uprules = reactive<FormRules<any>>({
                                     </ul>
                                 </li>
                                 <li>
-                                    <el-form-item prop="baomingbiao">
-                                        <el-upload ref="uploadRef2" class="upload-demo" :limit="1" action=""
-                                            accept=".jpg, .png" :auto-upload="false" :on-exceed="exceedFile"
-                                            :on-error="handleError" :on-success="handleSuccess"
-                                            :before-upload="beforeUPload">
+                                    <el-form-item prop="jiaoan" style="margin-left: 10px;">
+                                        <el-upload :limit="1" :auto-upload="false" action="" accept=".pdf"
+                                            :on-exceed="exceedFile" :on-error="handleError" :on-success="handleSuccess"
+                                            :before-upload="beforeUPload" :show-file-list="true"
+                                            v-model:file-list="UploadForm.jiaoan.file">
                                             <template #trigger>
-                                                <el-button type="primary" style="margin: 0 10px;">上传文件</el-button>
+                                                <el-button type="primary" style="margin:10px 10px 0 0;">选择文件</el-button>
                                             </template>
-                                            <span>请上传100M以内的文件</span>
+                                            <el-button type="primary" style="margin-right: 10px;"
+                                                @click="uploadFile(UploadForm.jiaoan)">
+                                                上传文件
+                                            </el-button>
                                         </el-upload>
+                                        <span>请上传100M以内的文件</span>
                                     </el-form-item>
                                 </li>
                                 <li>
-                                    <el-form-item prop="baomingbiao">
-                                        <el-upload ref="uploadRef2" class="upload-demo" :limit="1" action=""
-                                            accept=".jpg, .png" :auto-upload="false" :on-exceed="exceedFile"
-                                            :on-error="handleError" :on-success="handleSuccess"
-                                            :before-upload="beforeUPload">
+                                    <el-form-item prop="baogao" style="margin-left: 10px;">
+                                        <el-upload :limit="1" :auto-upload="false" action="" accept=".pdf"
+                                            :on-exceed="exceedFile" :on-error="handleError" :on-success="handleSuccess"
+                                            :before-upload="beforeUPload" :show-file-list="true"
+                                            v-model:file-list="UploadForm.baogao.file">
                                             <template #trigger>
-                                                <el-button type="primary" style="margin: 0 10px;">上传文件</el-button>
+                                                <el-button type="primary" style="margin:10px 10px 0 0;">选择文件</el-button>
                                             </template>
-                                            <span>请上传100M以内的文件</span>
+                                            <el-button type="primary" style="margin-right: 10px;"
+                                                @click="uploadFile(UploadForm.baogao)">
+                                                上传文件
+                                            </el-button>
                                         </el-upload>
+                                        <span>请上传100M以内的文件</span>
                                     </el-form-item>
                                 </li>
                                 <li>
-                                    <el-form-item prop="baomingbiao">
-                                        <el-upload ref="uploadRef2" class="upload-demo" :limit="1" action=""
-                                            accept=".jpg, .png" :auto-upload="false" :on-exceed="exceedFile"
-                                            :on-error="handleError" :on-success="handleSuccess"
-                                            :before-upload="beforeUPload">
+                                    <el-form-item prop="fangan" style="margin-left: 10px;">
+                                        <el-upload :limit="1" :auto-upload="false" action="" accept=".pdf"
+                                            :on-exceed="exceedFile" :on-error="handleError" :on-success="handleSuccess"
+                                            :before-upload="beforeUPload" :show-file-list="true"
+                                            v-model:file-list="UploadForm.fangan.file">
                                             <template #trigger>
-                                                <el-button type="primary" style="margin: 0 10px;">上传文件</el-button>
+                                                <el-button type="primary"
+                                                    style="margin: 10px 10px 0 0;">选择文件</el-button>
                                             </template>
-                                            <span>请上传100M以内的文件</span>
+                                            <el-button type="primary" style="margin-right: 10px;"
+                                                @click="uploadFile(UploadForm.fangan)">
+                                                上传文件
+                                            </el-button>
                                         </el-upload>
+                                        <span>请上传100M以内的文件</span>
                                     </el-form-item>
                                 </li>
                                 <li>
-                                    <el-form-item prop="baomingbiao">
-                                        <el-upload ref="uploadRef2" class="upload-demo" :limit="1" action=""
-                                            accept=".jpg, .png" :auto-upload="false" :on-exceed="exceedFile"
-                                            :on-error="handleError" :on-success="handleSuccess"
-                                            :before-upload="beforeUPload">
+                                    <el-form-item prop="biaozhun" style="margin-left: 10px;">
+                                        <el-upload :limit="1" :auto-upload="false" action="" accept=".pdf"
+                                            :on-exceed="exceedFile" :on-error="handleError" :on-success="handleSuccess"
+                                            :before-upload="beforeUPload" :show-file-list="true"
+                                            v-model:file-list="UploadForm.biaozhun.file">
                                             <template #trigger>
-                                                <el-button type="primary" style="margin: 0 10px;">上传文件</el-button>
+                                                <el-button type="primary"
+                                                    style="margin: 10px 10px 0 0;;">选择文件</el-button>
                                             </template>
-                                            <span>请上传100M以内的文件</span>
+                                            <el-button type="primary" style="margin-right: 10px;"
+                                                @click="uploadFile(UploadForm.biaozhun)">
+                                                上传文件
+                                            </el-button>
                                         </el-upload>
+                                        <span>请上传100M以内的文件</span>
                                     </el-form-item>
                                 </li>
-                                <li>
-                                    <el-form-item prop="baomingbiao">
-                                        <el-upload ref="uploadRef2" class="upload-demo" :limit="1" action=""
-                                            accept=".jpg, .png" :auto-upload="false" :on-exceed="exceedFile"
-                                            :on-error="handleError" :on-success="handleSuccess"
-                                            :before-upload="beforeUPload">
+                                <li style="position: relative;">
+                                    <el-form-item prop="shuoming" style="margin-left: 10px;">
+                                        <el-upload :limit="1" :auto-upload="false" action="" accept=".pdf"
+                                            :on-exceed="exceedFile" :on-error="handleError" :on-success="handleSuccess"
+                                            :before-upload="beforeUPload" :show-file-list="true"
+                                            v-model:file-list="UploadForm.shuoming.file">
                                             <template #trigger>
-                                                <el-button type="primary" style="margin: 0 10px;">上传文件</el-button>
+                                                <el-button type="primary"
+                                                    style="margin: 10px 10px 0 0;;">选择文件</el-button>
                                             </template>
-                                            <span>请上传100M以内的文件</span>
+                                            <el-button type="primary" style="margin-right: 10px;"
+                                                @click="uploadFile(UploadForm.shuoming)">
+                                                上传文件
+                                            </el-button>
                                         </el-upload>
+                                        <span>请上传100M以内的文件</span>
                                     </el-form-item>
                                 </li>
                             </ul>
@@ -633,7 +641,7 @@ const Uprules = reactive<FormRules<any>>({
                         style="margin: 0 30px; font-size: 20px; padding: 25px 60px;">
                         上一步
                     </el-button>
-                    <el-button type="primary" @click="SaveForm" size="large"
+                    <el-button type="primary" @click="SaveForm(UploadFormRef)" size="large"
                         style="margin: 0 30px; font-size: 20px; padding: 25px 60px;">
                         保存
                     </el-button>

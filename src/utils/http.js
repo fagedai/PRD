@@ -4,7 +4,7 @@ import { ElMessage } from "element-plus";
 
 const httpInstance = axios.create({
     baseURL: 'http://reg.vip.cpolar.cn',
-    timeout: 5000
+    timeout: 50000
 })
 
 //axios拦截器
@@ -26,15 +26,15 @@ httpInstance.interceptors.response.use(res => res.data, e => {
     //错误提示
     ElMessage({
         type: 'warning',
-        message: e.response.data.message
+        message: e.response
     })
     //401token失效处理
     //1.清除本地数据
     //2.跳转到登录页
-    if (e.response.status === 401) {
-        userStore.clearUserInfo()
-        router.push('/')
-    }
+    // if (e.response.status === 401) {
+    //     userStore.clearUserInfo()
+    //     router.push('/')
+    // }
     return Promise.reject(e)
 })
 
