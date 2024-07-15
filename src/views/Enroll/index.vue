@@ -352,6 +352,8 @@ const SaveForm = (formEl: FormInstance | undefined) => {
             temp.forEach(item => ruleForm.dsItemSubList.push(item))
             console.log(ruleForm)
             await UploadErollMes(ruleForm)
+            agreeBox1.value = true
+            agreeBox2.value = true
             ElMessage.success('已保存！');
         }
     })
@@ -361,10 +363,23 @@ const SubmitForm = () => {
     ElMessage.success('提交成功！');
 }
 
+////判断表单是否可修改
+const agreeBox1 = ref(false)
+const agreeBox2 = ref(false)
+
+const agreeChange = () => {
+    agreeBox1.value = false;
+    agreeBox2.value = false;
+}
 </script>
 
 <template>
     <div class="enroll">
+        <!-- 编辑修改 -->
+        <el-button class="edit" v-if="agreeBox1" @click="agreeChange">
+            <i></i>
+            <span>编辑</span>
+        </el-button>
         <!-- 填写作品信息模块 -->
         <div class="enroll_head">
             <div class="leftbox" :class="{ active_head: nowIdx === 0, hidden_head: nowIdx === 1 }">填写作品信息</div>
@@ -375,7 +390,7 @@ const SubmitForm = () => {
             <div v-show="nowIdx === 0" class="box1">
                 <div class="enroll_form">
                     <el-form ref="ruleFormRef" style="max-width: 600px" :model="ruleForm" :rules="rules"
-                        label-width="auto" class="demo-ruleForm" :size="formSize" status-icon>
+                        label-width="auto" class="demo-ruleForm" :size="formSize" status-icon :disabled="agreeBox1">
                         <el-form-item label="作品名称" prop="title">
                             <el-input v-model="ruleForm.title" placeholder="请输入作品名称" />
                         </el-form-item>
@@ -468,7 +483,6 @@ const SubmitForm = () => {
                         <el-form-item label="联系方式" prop="mobile">
                             <el-input v-model="ruleForm.mobile" placeholder="请填写联系方式" />
                         </el-form-item>
-                        <!-- submitForm(ruleFormRef) -->
                         <el-form-item style="margin: 60px 209px;" class="is-required">
                             <el-button type="primary" @click="NextForm(ruleFormRef)"
                                 style=" font-size: 20px; padding: 25px 60px;">
@@ -506,7 +520,7 @@ const SubmitForm = () => {
                         </ul>
                     </div>
                     <div class="right">
-                        <el-form ref="UploadFormRef" :model="UploadForm" :rules="Uprules">
+                        <el-form ref="UploadFormRef" :model="UploadForm" :rules="Uprules" :disabled="agreeBox2">
                             <ul>
                                 <li style="height: auto;">
                                     <ul style="padding: 10px 0 0 10px;">
@@ -657,4 +671,22 @@ const SubmitForm = () => {
 
 <style scoped>
 @import url(./css/enroll.css);
+
+.edit {
+    position: absolute;
+    top: 80px;
+    right: 320px;
+    border: 0;
+    color: #436EFF;
+
+    i {
+        display: inline-block;
+        width: 12px;
+        height: 12px;
+        background-image: url('/src/assets/PC端_slices/矢量智能对象@2x(2).png');
+        background-size: cover;
+        background-repeat: no-repeat;
+        margin-right: 3px;
+    }
+}
 </style>

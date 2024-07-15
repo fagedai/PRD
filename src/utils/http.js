@@ -12,7 +12,7 @@ const httpInstance = axios.create({
 //axios请求式拦截器
 httpInstance.interceptors.request.use(config => {
     //1.从本地获取token
-    const token = localStorage.getItem('token')
+    const token = sessionStorage.getItem('token')
     //2.拼接token数据
     if (token) {
         config.headers.Authorization = `Bearer ${token}`

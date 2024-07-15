@@ -4,16 +4,17 @@ import { ref } from 'vue';
 import { userInfoStore } from '@/stores/user';
 import { storeToRefs } from 'pinia';
 
+//从store获取数据
 const userStore = userInfoStore();
 const { userInfo } = storeToRefs(userStore);
 
-const isLogin = localStorage.getItem('isLogin') === 'true'
+//判断登录情况
+const isLogin = sessionStorage.getItem('isLogin') === 'true'
 const showLogin = ref(false);
 const ToEnroll = (event) => {
     if (isLogin) {
-        if (userInfo.value.userType === 2) {
+        if (userInfo.value.userType === 2)
             event.preventDefault();
-        }
         else
             sessionStorage.setItem('activeIndex', 2);
     }
@@ -22,9 +23,7 @@ const ToEnroll = (event) => {
         showLogin.value = true;
     }
 }
-const ToGuide = () => {
-    sessionStorage.setItem('activeIndex', 1);
-}
+const ToGuide = () => { sessionStorage.setItem('activeIndex', 1); }
 
 </script>
 
