@@ -29,7 +29,7 @@ const doLogin = () => {
         if (valid) {
             await userStore.getToken({ username, password })
             await userStore.getUserInfo()
-            const isLogin = localStorage.getItem("isLogin") === "true"
+            const isLogin = sessionStorage.getItem("isLogin") === "true"
             if (isLogin) {
                 // 1.提示用户
                 ElMessage({ type: 'success', message: '登陆成功' })
@@ -45,7 +45,7 @@ const doLogin = () => {
     })
 }
 
-const isLogin = localStorage.getItem("isLogin") === "true"
+const isLogin = sessionStorage.getItem("isLogin") === "true"
 
 function kannoFn() {
     location.reload();
@@ -64,9 +64,7 @@ const dialogFormVisible = defineModel()
 
 //退出登录
 const Quit = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('isLogin');
-    sessionStorage.setItem('activeIndex', '0')
+
     userStore.clearUserInfo();
     ElMessage({
         message: "退出成功",

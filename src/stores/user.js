@@ -1,6 +1,6 @@
 //管理用户数据
-import { defineStore } from "pinia";
 import { ref } from 'vue';
+import { defineStore } from "pinia";
 import { loginAPI, getUserInfoAPI } from '@/apis/user';
 
 export const userInfoStore = defineStore('user', () => {
@@ -18,22 +18,27 @@ export const userInfoStore = defineStore('user', () => {
     const getToken = async ({ username, password }) => {
         const res = await loginAPI({ username, password })
         if (res.token !== undefined) {
-            localStorage.setItem("token", res.token);
-            localStorage.setItem("isLogin", true)
+            sessionStorage.setItem("token", res.token);
+            sessionStorage.setItem("isLogin", true)
         }
         else {
-            localStorage.setItem("isLogin", false);
+            sessionStorage.setItem("isLogin", false);
         }
     }
     const getUserInfo = async () => {
-        const res = await getUserInfoAPI()
-        console.log(res.dsUser);
-        userInfo.value.userId = res.dsUser.userId
-        userInfo.value.userType = res.dsUser.userType
-        userInfo.value.nickName = res.dsUser.nickName
-        userInfo.value.readFlag = res.dsUser.readFlag
-        userInfo.value.schoolName = res.dsUser.schoolName
-        userInfo.value.approveType = res.dsUser.approveType
+        try {
+            const res = await getUserInfoAPI()
+            console.log(res);
+            if (res.code === 200) {
+                userInfo.value.userId = res.dsUser.userId
+                userInfo.value.userType = res.dsUser.userType
+                userInfo.value.nickName = res.dsUser.nickName
+                userInfo.value.readFlag = res.dsUser.readFlag
+                userInfo.value.schoolName = res.dsUser.schoolName
+                userInfo.value.approveType = res.dsUser.approveType
+            }
+        } catch (error) {
+        }
     }
     const isRead = () => {
         userInfo.value.readFlag = 1;
@@ -42,6 +47,9 @@ export const userInfoStore = defineStore('user', () => {
 
     //退出时清理用户信息
     const clearUserInfo = () => {
+        sessionStorage.removeItem('token');
+        sessionStorage.removeItem('isLogin');
+        sessionStorage.setItem('activeIndex', '0')
         userInfo.value.userId = null
         userInfo.value.userType = null
         userInfo.value.nickName = null

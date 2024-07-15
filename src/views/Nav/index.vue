@@ -19,7 +19,7 @@ const actIdx = ref(0);
 const isIndexActive = (index) => {
     return index === curIdx.value || index === actIdx.value;
 };
-const isLogin = localStorage.getItem('isLogin') === "true";
+const isLogin = sessionStorage.getItem('isLogin') === "true";
 const updateActiveIndex = (route, index) => {
     if ((route.name === '我要报名' || route.name === '进入专家评审') && !isLogin) {
         showLogin.value = true;

@@ -51,7 +51,7 @@ const router = createRouter({
 //登录校验
 router.beforeEach((to, from, next) => {
   // const store = userInfoStore()
-  let isLogin = localStorage.getItem('isLogin') === "true"
+  let isLogin = sessionStorage.getItem('isLogin') === "true"
   if (to.name !== 'primarily' && to.name !== 'guide' && !isLogin) {
     next({ name: from.name })
   } else {
