@@ -153,11 +153,12 @@ const postItemScoreToNext = async () => {
                         <div class="fileShow">
                             <i></i>
                             <div style="float: right;margin: 10px 0;"><a :href="jiaoan[0].url"
-                                    style="margin: auto 0;">{{ jiaoan[0]?.subTitle }}</a></div>
+                                    v-if="jiaoan && jiaoan.length > 0" style="margin: auto 0;">{{ jiaoan[0]?.subTitle
+                                    }}</a></div>
                         </div>
                         <div class="download" @click="get">
                             <i></i>
-                            <a :href="jiaoan[0].url" download>下载</a>
+                            <a v-if="jiaoan && jiaoan.length > 0" :href="jiaoan[0].url" download>下载</a>
                         </div>
                     </td>
                 </tr>
@@ -167,11 +168,12 @@ const postItemScoreToNext = async () => {
                         <div class="fileShow">
                             <i></i>
                             <div style="float: right;margin: 10px 0;"><a :href="baogao[0].url"
-                                    style="margin: auto 0;">{{ baogao[0]?.subTitle }}</a></div>
+                                    v-if="baogao && baogao.length > 0" style="margin: auto 0;">{{ baogao[0]?.subTitle
+                                    }}</a></div>
                         </div>
                         <div class="download">
                             <i></i>
-                            <a :href="baogao[0].url" download>下载</a>
+                            <a v-if="baogao && baogao.length > 0" :href="baogao[0].url" download>下载</a>
                         </div>
                     </td>
                 </tr>
@@ -181,11 +183,12 @@ const postItemScoreToNext = async () => {
                         <div class="fileShow">
                             <i></i>
                             <div style="float: right;margin: 10px 0;"><a :href="fangan[0].url"
-                                    style="margin: auto 0;">{{ fangan[0]?.subTitle }}</a></div>
+                                    v-if="fangan && fangan.length > 0" style="margin: auto 0;">{{ fangan[0]?.subTitle
+                                    }}</a></div>
                         </div>
                         <div class="download">
                             <i></i>
-                            <a :href="fangan[0].url" download>下载</a>
+                            <a v-if="fangan && fangan.length > 0" :href="fangan[0].url" download>下载</a>
                         </div>
                     </td>
                 </tr>
@@ -195,11 +198,12 @@ const postItemScoreToNext = async () => {
                         <div class="fileShow">
                             <i></i>
                             <div style="float: right;margin: 10px 0;"><a :href="biaozhun[0].url"
-                                    style="margin: auto 0;">{{ biaozhun[0]?.subTitle }}</a></div>
+                                    v-if="biaozhun && biaozhun.length > 0" style="margin: auto 0;">{{
+                                        biaozhun[0]?.subTitle }}</a></div>
                         </div>
                         <div class="download">
                             <i></i>
-                            <a :href="biaozhun[0].url" download>下载</a>
+                            <a v-if="biaozhun && biaozhun.length > 0" :href="biaozhun[0]?.url" download>下载</a>
                         </div>
                     </td>
                 </tr>
@@ -209,11 +213,12 @@ const postItemScoreToNext = async () => {
                         <div class="fileShow">
                             <i></i>
                             <div style="float: right;margin: 10px 0;"><a :href="shuoming[0].url"
-                                    style="margin: auto 0;">{{ shuoming[0]?.subTitle }}</a></div>
+                                    v-if="shuoming && shuoming.length > 0" style="margin: auto 0;">{{
+                                        shuoming[0]?.subTitle }}</a></div>
                         </div>
                         <div class="download">
                             <i></i>
-                            <a :href="shuoming[0].url" download>下载</a>
+                            <a v-if="shuoming && shuoming.length > 0" :href="shuoming[0].url" download>下载</a>
                         </div>
                     </td>
                 </tr>
@@ -392,6 +397,7 @@ const postItemScoreToNext = async () => {
                 }
 
                 .download {
+                    display: flex;
                     float: right;
                     cursor: pointer;
                     margin: 10px 0;

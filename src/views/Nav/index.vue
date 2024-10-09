@@ -1,56 +1,22 @@
 <script setup>
-import { ref } from "vue";
 import Login from '@/views/Login/index.vue';
-import { userInfoStore } from '@/stores/user';
-import { storeToRefs } from 'pinia';
+import useUserStore from './hooks/useUserStore'
+import useNavigation from './hooks/useNavigation'
 
-const userStore = userInfoStore();
-const { userInfo } = storeToRefs(userStore);
-
-const list = ref([
-    { path: "/home/primarily", name: "首页" },
-    { path: "/home/guide", name: "比赛指南" },
-    { path: "/home/enroll", name: "我要报名" },
-    { path: "/home/expert", name: "进入专家评审" },
-]);
-
-const curIdx = ref(-1);
-const actIdx = ref(0);
-const isIndexActive = (index) => {
-    return index === curIdx.value || index === actIdx.value;
-};
-const isLogin = sessionStorage.getItem('isLogin') === "true";
-const updateActiveIndex = (route, index) => {
-    if ((route.name === '我要报名' || route.name === '进入专家评审') && !isLogin) {
-        showLogin.value = true;
-    }
-    else {
-        actIdx.value = index;
-        // 将激活的索引保存到sessionStorage
-        sessionStorage.setItem('activeIndex', index);
-    }
-};
-
-// 从sessionStorage获取激活的索引
-const storedIndex = sessionStorage.getItem('activeIndex');
-if (storedIndex !== null) {
-    actIdx.value = parseInt(storedIndex, 10);
-}
-
-const showLogin = ref(false)
-
+const { userInfo } = useUserStore()
+const { list, showLogin, updateActiveIndex } = useNavigation()
 </script>
 <template>
     <div class="nav">
-        <div class="nav_item" @mouseleave="curIdx = -1">
+        <div class="nav_item">
             <div class="nav_logo">
                 <img src="/src/assets/PC端_slices/组 4@2x(3).png" alt="Logo" />
             </div>
             <div class="nav_column">
                 <routerLink :to="route.path" v-for="( route, index ) in  list" :key="index" class="link"
-                    :class="{ active: isIndexActive(index) }" @mouseenter="curIdx = index" @mouseleave="curIdx = -1"
+                    active-class="active"
                     :style="{ 'display': ((userInfo.userType === 1 && route.name === '进入专家评审') || (userInfo.userType === 2 && route.name === '我要报名')) ? 'none' : '' }"
-                    @click="updateActiveIndex(route, index)">
+                    @click="updateActiveIndex(route)">
                     <span>{{ route.name }}</span>
                 </routerLink>
             </div>
@@ -95,6 +61,13 @@ const showLogin = ref(false)
         padding: 0 20px;
         line-height: 40px;
         cursor: pointer;
+    }
+
+    .link:hover {
+        border-top: 2px solid #436EFF;
+        background-color: #F6F7FC;
+        color: #436EFF;
+        font-weight: bold;
     }
 }
 
